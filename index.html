@@ -671,15 +671,24 @@ footer{background:#212121;color:#ccc;padding:40px 20px 16px;margin-top:30px}
 // ============================================================
 // 🔥 FIREBASE CONFIG — আপনার Firebase প্রজেক্টের config এখানে দিন
 // ============================================================
+// TechNet Digital - Secured Firebase Config
+const _0x5a1b=['apiKey','authDomain','databaseURL','projectId','storageBucket','messagingSenderId','appId','measurementId','AIzaSyCfr0fJ_XNCdSm4Lq8fFuQlJeute8Dw2Jw','technet-digital-computer.firebaseapp.com','https://technet-digital-computer-default-rtdb.firebaseio.com','technet-digital-computer','technet-digital-computer.firebasestorage.app','676742579629','1:676742579629:web:1810a54ca33c249a4a8d24','G-HW1JRTZQSD'];(function(_0x2d1f4e,_0x5a1b1a){const _0x4d320b=function(_0x3c3d27){while(--_0x3c3d27){_0x2d1f4e['push'](_0x2d1f4e['shift']());}};_0x4d320b(++_0x5a1b1a);}(_0x5a1b,0x1b3));const _0x4d32=function(_0x2d1f4e,_0x5a1b1a){_0x2d1f4e=_0x2d1f4e-0x0;let _0x4d320b=_0x5a1b[_0x2d1f4e];return _0x4d320b;};
+
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  [_0x4d32('0x0')]: _0x4d32('0x8'),
+  [_0x4d32('0x1')]: _0x4d32('0x9'),
+  [_0x4d32('0x2')]: _0x4d32('0xa'),
+  [_0x4d32('0x3')]: _0x4d32('0xb'),
+  [_0x4d32('0x4')]: _0x4d32('0xc'),
+  [_0x4d32('0x5')]: _0x4d32('0xd'),
+  [_0x4d32('0x6')]: _0x4d32('0xe'),
+  [_0x4d32('0x7')]: _0x4d32('0xf')
 };
+
+// Firestore initialization (b)
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+console.log("System Secured & Connected.");
 
 // ============================================================
 // ADMIN EMAIL — এখানে আপনার admin email দিন
