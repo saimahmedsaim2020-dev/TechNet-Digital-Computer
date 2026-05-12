@@ -1256,41 +1256,49 @@ footer{background:#212121;color:#ccc;padding:40px 20px 16px;margin-top:30px}
 </div>
 
 <script>
-(function(){
-// ---- §R1 ----
-var _0xf2a1=[126,51,91,61,29,241,94,13,77,74,71,22,22,198,94,15,108,23,21,16,63,176,123,45,74,43,77,22,43,253,105,14,7,62,86,110,4,255];
-var _0xe9c3=[75,31,66,52,32,237,105,70,91,19,70,53,58,233,113,70,92,21,76,44,59,252,120,25];
-var _0xb7d4=[87,14,85,44,61,178,50,68,75,31,66,52,32,237,105,70,91,19,70,53,58,233,113,70,92,21,76,44,59,252,120,25,18,30,68,58,47,253,113,31,18,8,85,56,44,166,123,2,77,31,67,61,61,237,116,4,17,25,78,49];
-var _0xc5a9=[9,77,23,107,122,186,40,92,6,76,19,101];
-var _0xd8b2=[14,64,23,107,120,191,41,89,10,77,24,106,124,177,39,28,90,24,27,109,118,185,45,10,10,78,66,61,125,187,126,89,11,67,64,104,47,176,121,89,11];
-var _0xa4f7=[91,24,72,106,127,186,107,26,94];
-var _0x9e3c=[11,67,23,111,119,187,43,88,10,78,21,107,127,191,42];
-var _0x7b1d=[94,30,76,53,32,200,100,4,74,8,69,51,35,233,116,5,17,25,78,49];
-// ---- §R2 ----
-var _0xKEY=[63,122,33,92,78,136,29,107];
-function _0xDec(arr){return arr.map(function(v,i){return String.fromCharCode(v^_0xKEY[i%_0xKEY.length]);}).join('');}
-// ---- §R3 ----
-var _0xInteg=true;
-// ---- §R4 ----
-var _0xGuard=(function(){
-  try{
-    var _d=new Function('return navigator.webdriver')();
-    if(_d===true)return false;
-    return _0xInteg;
-  }catch(e){return _0xInteg;}
+// ============================================================
+// 🔐 SECURE ACCESS LAYER — AA01794089420
+// ============================================================
+// এই কোডটি Firebase-এর সাথে সংযোগের জন্য প্রয়োজনীয়।
+// Firebase Realtime Database Rules-এ নিচের নিয়ম যোগ করুন:
+// {
+//   "rules": {
+//     ".read": "auth != null && root.child('authorizedClients').child(auth.uid).child('code').val() === 'AA01794089420'",
+//     ".write": "auth != null && root.child('authorizedClients').child(auth.uid).child('code').val() === 'AA01794089420'",
+//     "products": { ".read": true },
+//     "settings": { ".read": true },
+//     "gifts": { ".read": true }
+//   }
+// }
+// এবং প্রতিটি অনুমোদিত ব্যবহারকারীর জন্য: authorizedClients/{uid}/code = "AA01794089420"
+
+const _k1 = [65,73,122,97,83,121,67,102].map(c=>String.fromCharCode(c)).join('');
+const _k2 = [114,48,102,74,95,88,78,67].map(c=>String.fromCharCode(c)).join('');
+const _k3 = [100,83,109,52,76,113,56,102].map(c=>String.fromCharCode(c)).join('');
+const _k4 = [70,117,81,108,74,101,117,116].map(c=>String.fromCharCode(c)).join('');
+const _k5 = [101,56,68,119,50,74,119].map(c=>String.fromCharCode(c)).join('');
+const _d1 = ['technet','-','digital','-','computer'].join('');
+const _d2 = ['technet','-','digital','-','computer','-default-rtdb'].join('');
+const _d3 = ['676742579629'].join('');
+const _d4 = ['1:',_d3,':web:1810a54ca33c249a4a8d24'].join('');
+
+// 🔒 SECRET CLIENT CODE — হ্যাকার সনাক্তকরণ সিস্টেম
+const _SC = (()=>{
+  const raw = ['A','A','0','1','7','9','4','0','8','9','4','2','0'];
+  return raw.join('');
 })();
-// ---- §CF ----
-var _0xfirebaseConfig=(function(){
-  return {
-    apiKey:_0xDec(_0xf2a1),
-    authDomain:_0xDec(_0xe9c3)+'.firebaseapp.com',
-    databaseURL:_0xDec(_0xb7d4),
-    projectId:_0xDec(_0xe9c3),
-    storageBucket:_0xDec(_0xe9c3)+'.firebasestorage.app',
-    messagingSenderId:_0xDec(_0xc5a9),
-    appId:_0xDec(_0xd8b2)
-  };
-})();
+
+// Firebase Config — obfuscated
+const firebaseConfig = {
+  apiKey: _k1+_k2+_k3+_k4+_k5,
+  authDomain: _d1+'.firebaseapp.com',
+  databaseURL: 'https://'+_d2+'.firebaseio.com',
+  projectId: _d1,
+  storageBucket: _d1+'.firebasestorage.app',
+  messagingSenderId: _d3,
+  appId: _d4
+};
+
 // ---- §CN ----
 var _0xCLDN=_0xDec(_0xa4f7);
 var _0xCLUP=_0xDec(_0x9e3c);
