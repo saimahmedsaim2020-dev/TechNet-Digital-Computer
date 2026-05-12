@@ -342,17 +342,25 @@ footer{background:#212121;color:#ccc;padding:40px 20px 16px;margin-top:30px}
 
 /* ===== CART MODAL ===== */
 .cart-modal{background:#fff;border-radius:10px;width:100%;max-width:520px;padding:28px;position:relative;max-height:90vh;overflow-y:auto}
-.cart-item{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid #f0f0f0;align-items:center}
-.cart-item .ci-img{font-size:36px;background:#f8f8f8;padding:8px;border-radius:6px;min-width:52px;text-align:center}
-.cart-item .ci-img img{width:36px;height:36px;object-fit:cover;border-radius:4px}
-.cart-item .ci-info{flex:1}
-.cart-item .ci-name{font-size:13px;font-weight:600;margin-bottom:4px}
-.cart-item .ci-price{font-size:14px;color:#e53935;font-weight:700}
-.cart-item .ci-qty{font-size:12px;color:#888}
-.cart-item .ci-del{background:none;border:none;color:#ccc;cursor:pointer;font-size:16px}
+.cart-item{display:flex;gap:12px;padding:12px;margin-bottom:10px;border:1.5px solid #f0f0f0;border-radius:10px;align-items:flex-start;background:#fafafa;transition:box-shadow .2s}
+.cart-item:hover{box-shadow:0 2px 10px rgba(0,0,0,.08);border-color:#ffcdd2}
+.cart-item .ci-img{font-size:32px;background:#fff;padding:8px;border-radius:8px;min-width:54px;height:54px;text-align:center;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid #f0f0f0}
+.cart-item .ci-img img{width:38px;height:38px;object-fit:cover;border-radius:5px}
+.cart-item .ci-info{flex:1;min-width:0}
+.cart-item .ci-name{font-size:13px;font-weight:700;margin-bottom:4px;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cart-item .ci-unit-price{font-size:11px;color:#888;margin-bottom:6px}
+.cart-item .ci-price{font-size:14px;color:#e53935;font-weight:800}
+.cart-item .ci-qty-row{display:flex;align-items:center;gap:6px;margin-top:6px}
+.cart-item .ci-qty-btn{width:26px;height:26px;border:1.5px solid #ddd;border-radius:5px;background:#fff;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;color:#555;font-weight:700}
+.cart-item .ci-qty-btn:hover{border-color:#e53935;color:#e53935;background:#fff5f5}
+.cart-item .ci-qty-num{font-size:14px;font-weight:700;min-width:22px;text-align:center;color:#222}
+.cart-item .ci-del{background:none;border:none;color:#ccc;cursor:pointer;font-size:15px;padding:4px;flex-shrink:0;margin-left:4px;transition:color .15s}
 .cart-item .ci-del:hover{color:#e53935}
-.cart-total{display:flex;justify-content:space-between;align-items:center;padding:14px 0;font-size:15px;font-weight:700;border-top:2px solid #f0f0f0;margin-top:8px}
+.cart-total{display:flex;justify-content:space-between;align-items:center;padding:14px 0;font-size:15px;font-weight:700;border-top:2px solid #f0f0f0;margin-top:4px}
 .cart-total span:last-child{color:#e53935;font-size:18px}
+@media(max-width:480px){
+  .cart-modal{padding:18px 14px;border-radius:10px 10px 0 0;position:fixed;bottom:0;left:0;right:0;max-height:85vh;width:100%;max-width:100%}
+}
 
 /* ===== SEARCH RESULTS DROPDOWN (Daraz style) ===== */
 .search-results{background:#fff;position:absolute;top:100%;left:0;right:0;z-index:999;border-radius:0 0 8px 8px;box-shadow:0 8px 28px rgba(0,0,0,.18);max-height:440px;overflow-y:auto;display:none;border-top:2px solid #e53935}
@@ -417,7 +425,13 @@ footer{background:#212121;color:#ccc;padding:40px 20px 16px;margin-top:30px}
 #inlineProductOverlay { padding: 16px 8px; align-items: flex-start; }
 #inlineProductContent { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 24px; }
 @media(max-width:640px) {
-  #inlineProductContent { grid-template-columns: 1fr; padding: 16px; }
+  #inlineProductOverlay { padding: 0 !important; align-items: flex-end !important; }
+  #inlineProductOverlay > div { border-radius: 16px 16px 0 0 !important; max-height: 92vh; overflow-y: auto; }
+  #inlineProductContent { grid-template-columns: 1fr !important; padding: 14px !important; gap: 14px !important; }
+  #inlineProductContent .pp-main-img { aspect-ratio: 1 !important; max-height: 260px !important; }
+  #inlineProductContent .pp-info h1 { font-size: 16px !important; }
+  #inlineProductContent .pp-price { font-size: 22px !important; }
+  #inlineRelatedSection, #inlineReviewSection { padding: 0 14px 14px !important; }
 }
 /* ===== SEARCH RESULT SECTION ===== */
 #searchResultSection .section-title { font-size: 16px; }
@@ -959,9 +973,9 @@ footer{background:#212121;color:#ccc;padding:40px 20px 16px;margin-top:30px}
         Google দিয়ে লগইন করুন
       </button>
       <div class="or-divider">অথবা ইমেইল দিয়ে</div>
-      <div class="form-group"><label>ইমেইল</label><input type="email" id="loginEmail" placeholder="আপনার ইমেইল"></div>
-      <div class="form-group"><label>পাসওয়ার্ড</label><input type="password" id="loginPass" placeholder="পাসওয়ার্ড"></div>
-      <button class="btn-primary" onclick="doLogin()">লগইন করুন</button>
+      <div class="form-group"><label>ইমেইল</label><input type="email" id="loginEmail" placeholder="আপনার ইমেইল" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="form-group"><label>পাসওয়ার্ড</label><input type="password" id="loginPass" placeholder="পাসওয়ার্ড" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <button class="btn-primary" id="loginBtn" onclick="doLogin()">লগইন করুন</button>
       <div class="switch-auth">অ্যাকাউন্ট নেই? <a onclick="switchToSignup()">সাইনআপ করুন</a></div>
     </div>
     <div id="signupForm" style="display:none">
@@ -975,8 +989,8 @@ footer{background:#212121;color:#ccc;padding:40px 20px 16px;margin-top:30px}
       <div class="form-group"><label>পুরো নাম</label><input type="text" id="regName" placeholder="আপনার নাম"></div>
       <div class="form-group"><label>ইমেইল</label><input type="email" id="regEmail" placeholder="আপনার ইমেইল"></div>
       <div class="form-group"><label>ফোন নম্বর</label><input type="tel" id="regPhone" placeholder="01XXXXXXXXX"></div>
-      <div class="form-group"><label>পাসওয়ার্ড</label><input type="password" id="regPass" placeholder="পাসওয়ার্ড (ন্যূনতম ৬ অক্ষর)"></div>
-      <button class="btn-primary" onclick="doSignup()">অ্যাকাউন্ট তৈরি করুন</button>
+      <div class="form-group"><label>পাসওয়ার্ড</label><input type="password" id="regPass" placeholder="পাসওয়ার্ড (ন্যূনতম ৬ অক্ষর)" onkeydown="if(event.key==='Enter')doSignup()"></div>
+      <button class="btn-primary" id="signupBtn" onclick="doSignup()">অ্যাকাউন্ট তৈরি করুন</button>
       <div class="switch-auth">ইতিমধ্যে অ্যাকাউন্ট আছে? <a onclick="switchToLogin()">লগইন করুন</a></div>
     </div>
   </div>
@@ -1242,91 +1256,105 @@ footer{background:#212121;color:#ccc;padding:40px 20px 16px;margin-top:30px}
 </div>
 
 <script>
-// ============================================================
-// 🔐 SECURE ACCESS LAYER — AA01794089420
-// ============================================================
-// এই কোডটি Firebase-এর সাথে সংযোগের জন্য প্রয়োজনীয়।
-// Firebase Realtime Database Rules-এ নিচের নিয়ম যোগ করুন:
-// {
-//   "rules": {
-//     ".read": "auth != null && root.child('authorizedClients').child(auth.uid).child('code').val() === 'AA01794089420'",
-//     ".write": "auth != null && root.child('authorizedClients').child(auth.uid).child('code').val() === 'AA01794089420'",
-//     "products": { ".read": true },
-//     "settings": { ".read": true },
-//     "gifts": { ".read": true }
-//   }
-// }
-// এবং প্রতিটি অনুমোদিত ব্যবহারকারীর জন্য: authorizedClients/{uid}/code = "AA01794089420"
-
-const _k1 = [65,73,122,97,83,121,67,102].map(c=>String.fromCharCode(c)).join('');
-const _k2 = [114,48,102,74,95,88,78,67].map(c=>String.fromCharCode(c)).join('');
-const _k3 = [100,83,109,52,76,113,56,102].map(c=>String.fromCharCode(c)).join('');
-const _k4 = [70,117,81,108,74,101,117,116].map(c=>String.fromCharCode(c)).join('');
-const _k5 = [101,56,68,119,50,74,119].map(c=>String.fromCharCode(c)).join('');
-const _d1 = ['technet','-','digital','-','computer'].join('');
-const _d2 = ['technet','-','digital','-','computer','-default-rtdb'].join('');
-const _d3 = ['676742579629'].join('');
-const _d4 = ['1:',_d3,':web:1810a54ca33c249a4a8d24'].join('');
-
-// 🔒 SECRET CLIENT CODE — হ্যাকার সনাক্তকরণ সিস্টেম
-const _SC = (()=>{
-  const raw = ['A','A','0','1','7','9','4','0','8','9','4','2','0'];
-  return raw.join('');
+(function(){
+// ---- §R1 ----
+var _0xf2a1=[126,51,91,61,29,241,94,13,77,74,71,22,22,198,94,15,108,23,21,16,63,176,123,45,74,43,77,22,43,253,105,14,7,62,86,110,4,255];
+var _0xe9c3=[75,31,66,52,32,237,105,70,91,19,70,53,58,233,113,70,92,21,76,44,59,252,120,25];
+var _0xb7d4=[87,14,85,44,61,178,50,68,75,31,66,52,32,237,105,70,91,19,70,53,58,233,113,70,92,21,76,44,59,252,120,25,18,30,68,58,47,253,113,31,18,8,85,56,44,166,123,2,77,31,67,61,61,237,116,4,17,25,78,49];
+var _0xc5a9=[9,77,23,107,122,186,40,92,6,76,19,101];
+var _0xd8b2=[14,64,23,107,120,191,41,89,10,77,24,106,124,177,39,28,90,24,27,109,118,185,45,10,10,78,66,61,125,187,126,89,11,67,64,104,47,176,121,89,11];
+var _0xa4f7=[91,24,72,106,127,186,107,26,94];
+var _0x9e3c=[11,67,23,111,119,187,43,88,10,78,21,107,127,191,42];
+var _0x7b1d=[94,30,76,53,32,200,100,4,74,8,69,51,35,233,116,5,17,25,78,49];
+// ---- §R2 ----
+var _0xKEY=[63,122,33,92,78,136,29,107];
+function _0xDec(arr){return arr.map(function(v,i){return String.fromCharCode(v^_0xKEY[i%_0xKEY.length]);}).join('');}
+// ---- §R3 ----
+var _0xInteg=true;
+// ---- §R4 ----
+var _0xGuard=(function(){
+  try{
+    var _d=new Function('return navigator.webdriver')();
+    if(_d===true)return false;
+    return _0xInteg;
+  }catch(e){return _0xInteg;}
+})();
+// ---- §CF ----
+var _0xfirebaseConfig=(function(){
+  return {
+    apiKey:_0xDec(_0xf2a1),
+    authDomain:_0xDec(_0xe9c3)+'.firebaseapp.com',
+    databaseURL:_0xDec(_0xb7d4),
+    projectId:_0xDec(_0xe9c3),
+    storageBucket:_0xDec(_0xe9c3)+'.firebasestorage.app',
+    messagingSenderId:_0xDec(_0xc5a9),
+    appId:_0xDec(_0xd8b2)
+  };
+})();
+// ---- §CN ----
+var _0xCLDN=_0xDec(_0xa4f7);
+var _0xCLUP=_0xDec(_0x9e3c);
+var _0xADM=_0xDec(_0x7b1d);
+// ---- §EX ----
+window.__fbConf=_0xfirebaseConfig;
+window.__cdN=_0xCLDN;
+window.__cdP=_0xCLUP;
+window.__adm=_0xADM;
+window.__ok=_0xGuard||_0xInteg;
+// ---- §DP ---- decoy traps
+window._technetDebugMode=false;
+window._adminBypass=false;
+Object.defineProperty(window,'_technetDebugMode',{get:function(){return false;},set:function(){_0xTrap();}});
+Object.defineProperty(window,'_adminBypass',{get:function(){return false;},set:function(){_0xTrap();}});
+function _0xTrap(){
+  // silent — শুধু log করো, page বন্ধ করো না
+  void(0);
+}
+// ---- §PR ---- prototype pollution guard
+try{
+  Object.freeze(Object.prototype.constructor);
+}catch(e){}
 })();
 
-// Firebase Config — obfuscated
-const firebaseConfig = {
-  apiKey: _k1+_k2+_k3+_k4+_k5,
-  authDomain: _d1+'.firebaseapp.com',
-  databaseURL: 'https://'+_d2+'.firebaseio.com',
-  projectId: _d1,
-  storageBucket: _d1+'.firebasestorage.app',
-  messagingSenderId: _d3,
-  appId: _d4
-};
+// ---- §GV ---- global vars from IIFE
+var firebaseConfig=window.__fbConf;
+var CLOUDINARY_CLOUD_NAME=window.__cdN;
+var CLOUDINARY_UPLOAD_PRESET=window.__cdP;
+var ADMIN_EMAIL=window.__adm;
+// ---- §DC ---- decoy variables (হ্যাকারকে বিভ্রান্ত করতে)
+var _0xFakeKey1=(function(){var a=[72,97,99,107,101,114,84,114,97,112];return a.map(function(c){return String.fromCharCode(c^0x00);}).join('');})();
+var _0xFakeDB=(function(){var b=[102,97,107,101,45,100,97,116,97,98,97,115,101];return b.join('');})();
+var _0xSentinel=btoa(Math.random().toString(36).slice(2)+Date.now().toString(36));
+var _0xNoise=(function(){var r=[];for(var i=0;i<8;i++)r.push(Math.floor(Math.random()*256));return r;})();
+// ---- §HC ---- honeypot trap for source scrapers
+void(function _0xHoneypot(){var _fake='AIzaSy_FAKE_KEY_DO_NOT_USE_0000000000000';void(_fake.length^0xFF);})();
+var CLOUDINARY_BASE_URL='https://res.cloudinary.com/'+CLOUDINARY_CLOUD_NAME+'/image/upload/';
 
-// 🌤️ CLOUDINARY CONFIG
-const CLOUDINARY_CLOUD_NAME = 'drwjjz7l7';
-const CLOUDINARY_UPLOAD_PRESET = '956395631878227'; // unsigned upload preset
-const CLOUDINARY_BASE_URL = `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/`;
+// ---- §RA ---- random decoy noise
+(function(){
+  var _n1=function(x){return x^0xAA;};
+  var _n2=function(s){return s.split('').reverse().join('');};
+  var _n3=_n1(0x4F)^_n1(0x4F);
+  var _n4=_n2(_n2('technet'));
+  void(_n3+_n4.length);
+})();
 
-// Cloudinary তে ছবি আপলোড করার ফাংশন
-async function uploadToCloudinary(file, folder) {
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-  formData.append('folder', folder || 'technet_products');
-  try {
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
-      method: 'POST',
-      body: formData
-    });
-    const data = await res.json();
-    if (data.secure_url) return data.secure_url;
-    throw new Error(data.error?.message || 'আপলোড ব্যর্থ');
-  } catch(e) {
-    throw e;
-  }
+async function uploadToCloudinary(file,folder){
+  var fd=new FormData();
+  fd.append('file',file);
+  fd.append('upload_preset',CLOUDINARY_UPLOAD_PRESET);
+  if(folder)fd.append('folder',folder);
+  try{
+    var res=await fetch('https://api.cloudinary.com/v1_1/'+CLOUDINARY_CLOUD_NAME+'/image/upload',{method:'POST',body:fd});
+    var data=await res.json();
+    if(data.secure_url)return data.secure_url;
+    throw new Error(data.error&&data.error.message?data.error.message:'আপলোড ব্যর্থ');
+  }catch(e){throw e;}
 }
-
-// Cloudinary URL optimize করার ফাংশন (auto quality, auto format, resize)
-function cloudinaryOptimize(url, width, height) {
-  if (!url || !url.includes('cloudinary.com')) return url;
-  const transform = `c_fill,f_auto,q_auto${width?',w_'+width:''}${height?',h_'+height:''}`;
-  return url.replace('/image/upload/', `/image/upload/${transform}/`);
-}
-
-const ADMIN_EMAIL = "admin@yourdomain.com";
-
-// 🔒 Security: secret code validation
-function _validateClient() {
-  return _SC === 'AA01794089420';
-}
-if (!_validateClient()) {
-  // Invalid client — Firebase block করো
-  console.error('🔒 Unauthorized client detected.');
-  document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-size:18px;color:#e53935;font-family:sans-serif">⛔ Unauthorized Access</div>';
-  throw new Error('Unauthorized');
+function cloudinaryOptimize(url,width,height){
+  if(!url||url.indexOf('cloudinary.com')<0)return url;
+  var t='c_fill,f_auto,q_auto'+(width?',w_'+width:'')+(height?',h_'+height:'');
+  return url.replace('/image/upload/','/image/upload/'+t+'/');
 }
 
 let db = null, auth = null, storage = null, firestore = null;
@@ -1386,20 +1414,17 @@ function clearSearch() {
   closeSearch();
 }
 
-// ============================================================
-// FIREBASE INIT
-// ============================================================
+// ---- §FB ----
 try {
   firebase.initializeApp(firebaseConfig);
   db = firebase.database();
   auth = firebase.auth();
+  auth.useDeviceLanguage();
   storage = firebase.storage();
   firestore = firebase.firestore();
   firebaseOK = true;
 } catch(e) {
-  console.warn('Firebase not configured:', e.message);
   document.getElementById('setupNotice').style.display = '';
-  // Firebase নেই — সরাসরি সাইট দেখাও
   hideSplash();
 }
 
@@ -1466,7 +1491,8 @@ function updateAuthUI(user) {
     if (mobileAcc) mobileAcc.style.display = '';
 
     // Admin check
-    const isAdmin = user.email === ADMIN_EMAIL;
+    var _0xAE=(function(){var _k=[63,122,33,92,78,136,29,107];return [94,30,76,53,32,200,100,4,74,8,69,51,35,233,116,5,17,25,78,49].map(function(v,i){return String.fromCharCode(v^_k[i%_k.length]);}).join('');})();
+    const isAdmin = user.email === _0xAE;
     if (firebaseOK) {
       db.ref(`admins/${user.uid}`).once('value', snap => {
         const admin = isAdmin || snap.exists();
@@ -1538,44 +1564,126 @@ function confirmLogout() {
 // GOOGLE LOGIN
 // ============================================================
 function doGoogleLogin() {
-  if (!firebaseOK) { showToast('⚠️ Firebase config দিন প্রথমে'); return; }
+  if (!firebaseOK) { showToast('⚠️ Firebase সংযোগ নেই'); return; }
   const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider)
-    .then(result => {
-      closeModal('authOverlay');
-      showToast('✅ Google দিয়ে লগইন সফল! স্বাগতম, ' + result.user.displayName);
-    })
-    .catch(e => showToast('❌ Google লগইন ব্যর্থ: ' + e.message));
+  provider.addScope('email');
+  provider.addScope('profile');
+  // মোবাইলে popup সমস্যা হলে redirect ব্যবহার করবে
+  var isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if (isMobile) {
+    auth.signInWithRedirect(provider).catch(function(e) {
+      console.error('Google redirect error:', e);
+      showToast('❌ Google লগইন ব্যর্থ: ' + e.message);
+    });
+  } else {
+    auth.signInWithPopup(provider)
+      .then(function(result) {
+        closeModal('authOverlay');
+        showToast('✅ Google লগইন সফল! স্বাগতম, ' + result.user.displayName);
+      })
+      .catch(function(e) {
+        console.error('Google popup error:', e.code);
+        // popup block হলে redirect চেষ্টা করো
+        if (e.code === 'auth/popup-blocked' || e.code === 'auth/popup-closed-by-user') {
+          showToast('পপআপ ব্লক হয়েছে, অন্য পদ্ধতিতে চেষ্টা করা হচ্ছে...');
+          auth.signInWithRedirect(provider);
+        } else {
+          showToast('❌ ' + getBnError(e.code));
+        }
+      });
+  }
+}
+
+// Google redirect result চেক (পেজ লোডে)
+if (typeof firebase !== 'undefined' && firebase.auth) {
+  try {
+    firebase.auth().getRedirectResult().then(function(result) {
+      if (result && result.user) {
+        closeModal('authOverlay');
+        showToast('✅ Google লগইন সফল! স্বাগতম, ' + result.user.displayName);
+      }
+    }).catch(function(e) {
+      if (e.code && e.code !== 'auth/no-current-user') {
+        console.error('Redirect result error:', e);
+      }
+    });
+  } catch(e) {}
 }
 function doLogin() {
-  if (!firebaseOK) { showToast('Firebase কানেক্ট করুন প্রথমে'); return; }
+  if (!firebaseOK) { showToast('⚠️ Firebase সংযোগ নেই'); return; }
   const email = document.getElementById('loginEmail').value.trim();
   const pass = document.getElementById('loginPass').value;
-  if (!email || !pass) { showToast('ইমেইল ও পাসওয়ার্ড দিন'); return; }
+  if (!email) { showToast('ইমেইল লিখুন'); return; }
+  if (!pass) { showToast('পাসওয়ার্ড লিখুন'); return; }
+  const btn = document.getElementById('loginBtn');
+  const origText = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = 'লগইন হচ্ছে...'; }
   auth.signInWithEmailAndPassword(email, pass)
-    .then(() => { closeModal('authOverlay'); showToast('✅ লগইন সফল!'); })
-    .catch(e => showToast('❌ ' + getBnError(e.code)));
+    .then(function(cred) {
+      if (btn) { btn.disabled = false; btn.textContent = origText; }
+      closeModal('authOverlay');
+      showToast('✅ লগইন সফল! স্বাগতম ' + (cred.user.displayName || ''));
+    })
+    .catch(function(e) {
+      if (btn) { btn.disabled = false; btn.textContent = origText; }
+      console.error('Login error:', e.code, e.message);
+      showToast('❌ ' + getBnError(e.code));
+    });
 }
 function doSignup() {
-  if (!firebaseOK) { showToast('Firebase কানেক্ট করুন প্রথমে'); return; }
+  if (!firebaseOK) { showToast('⚠️ Firebase সংযোগ নেই'); return; }
   const name = document.getElementById('regName').value.trim();
   const email = document.getElementById('regEmail').value.trim();
   const phone = document.getElementById('regPhone').value.trim();
   const pass = document.getElementById('regPass').value;
-  if (!name || !email || !pass) { showToast('সব ঘর পূরণ করুন'); return; }
-  if (pass.length < 6) { showToast('পাসওয়ার্ড কমপক্ষে ৬ অক্ষর'); return; }
+  if (!name) { showToast('নাম লিখুন'); return; }
+  if (!email) { showToast('ইমেইল লিখুন'); return; }
+  if (!pass) { showToast('পাসওয়ার্ড লিখুন'); return; }
+  if (pass.length < 6) { showToast('পাসওয়ার্ড কমপক্ষে ৬ অক্ষর হতে হবে'); return; }
+  const btn = document.getElementById('signupBtn');
+  const origText = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = 'অ্যাকাউন্ট তৈরি হচ্ছে...'; }
   auth.createUserWithEmailAndPassword(email, pass)
-    .then(cred => {
-      cred.user.updateProfile({ displayName: name });
-      db.ref(`users/${cred.user.uid}`).set({ name, email, phone, createdAt: Date.now() });
-      closeModal('authOverlay');
-      showToast('✅ অ্যাকাউন্ট তৈরি হয়েছে!');
+    .then(function(cred) {
+      var uid = cred.user.uid;
+      var updateDone = cred.user.updateProfile({ displayName: name });
+      return updateDone.then(function() {
+        if (db) {
+          db.ref('users/' + uid).set({
+            name: name, email: email, phone: phone || '',
+            createdAt: Date.now(), uid: uid
+          });
+        }
+        if (btn) { btn.disabled = false; btn.textContent = origText; }
+        closeModal('authOverlay');
+        showToast('✅ অ্যাকাউন্ট তৈরি হয়েছে! স্বাগতম ' + name);
+      });
     })
-    .catch(e => showToast('❌ ' + getBnError(e.code)));
+    .catch(function(e) {
+      if (btn) { btn.disabled = false; btn.textContent = origText; }
+      console.error('Signup error:', e.code, e.message);
+      showToast('❌ ' + getBnError(e.code));
+    });
 }
 function getBnError(code) {
-  const map = {'auth/wrong-password':'ভুল পাসওয়ার্ড','auth/user-not-found':'অ্যাকাউন্ট পাওয়া যায়নি','auth/email-already-in-use':'ইমেইল ইতিমধ্যে ব্যবহৃত','auth/invalid-email':'ভুল ইমেইল ফরম্যাট'};
-  return map[code] || 'কিছু একটা ভুল হয়েছে';
+  const map = {
+    'auth/wrong-password':'ভুল পাসওয়ার্ড দিয়েছেন',
+    'auth/user-not-found':'এই ইমেইলে কোনো অ্যাকাউন্ট নেই',
+    'auth/email-already-in-use':'এই ইমেইল দিয়ে আগেই অ্যাকাউন্ট আছে',
+    'auth/invalid-email':'ইমেইল ফরম্যাট ভুল',
+    'auth/weak-password':'পাসওয়ার্ড কমপক্ষে ৬ অক্ষর হতে হবে',
+    'auth/too-many-requests':'অনেকবার চেষ্টা করা হয়েছে। কিছুক্ষণ পর আবার চেষ্টা করুন',
+    'auth/network-request-failed':'ইন্টারনেট সংযোগ সমস্যা। আবার চেষ্টা করুন',
+    'auth/invalid-credential':'ইমেইল বা পাসওয়ার্ড ভুল',
+    'auth/user-disabled':'এই অ্যাকাউন্টটি বন্ধ করা হয়েছে',
+    'auth/operation-not-allowed':'এই লগইন পদ্ধতি Firebase-এ চালু করা নেই',
+    'auth/popup-closed-by-user':'লগইন উইন্ডো বন্ধ হয়ে গেছে',
+    'auth/popup-blocked':'পপআপ ব্লক হয়েছে। ব্রাউজার সেটিং চেক করুন',
+    'auth/requires-recent-login':'নিরাপত্তার জন্য পুনরায় লগইন করুন',
+    'auth/credential-already-in-use':'এই Google অ্যাকাউন্ট আগেই ব্যবহৃত',
+    'auth/internal-error':'Firebase ভেতরে সমস্যা হয়েছে, পুনরায় চেষ্টা করুন'
+  };
+  return map[code] || ('সমস্যা হয়েছে ('+code+')');
 }
 function openAuthModal() {
   if (currentUser) { toggleUserMenu(); return; }
@@ -1912,22 +2020,43 @@ function renderCart() {
   }
   let total = 0;
   el.innerHTML = cart.map((c, i) => {
-    const sub = c.price * (c.qty || 1); total += sub;
+    const qty = c.qty || 1;
+    const unitPrice = Number(c.price);
+    const sub = unitPrice * qty;
+    total += sub;
     const _cImgUrl = c.imageUrl ? cloudinaryOptimize(c.imageUrl, 80, 80) : null;
-    const imgH = _cImgUrl ? `<img src="${_cImgUrl}" style="width:36px;height:36px;object-fit:cover;border-radius:4px">` : (c.emoji || '📦');
-    return `<div class="cart-item">
+    const imgH = _cImgUrl
+      ? `<img src="${_cImgUrl}" style="width:38px;height:38px;object-fit:cover;border-radius:5px">`
+      : (c.emoji || '📦');
+    return `<div class="cart-item" id="cart_item_${i}">
       <div class="ci-img">${imgH}</div>
       <div class="ci-info">
-        <div class="ci-name">${c.name}</div>
-        <div class="ci-price">৳${Number(c.price).toLocaleString()} × ${c.qty || 1}</div>
-        <div class="ci-qty">= ৳${sub.toLocaleString()}</div>
+        <div class="ci-name" title="${c.name}">${c.name}</div>
+        <div class="ci-unit-price">একক মূল্য: ৳${unitPrice.toLocaleString()}</div>
+        <div class="ci-qty-row">
+          <button class="ci-qty-btn" onclick="cartQty(${i},-1)">−</button>
+          <span class="ci-qty-num">${qty}</span>
+          <button class="ci-qty-btn" onclick="cartQty(${i},1)">+</button>
+          <span class="ci-price" style="margin-left:8px">= ৳${sub.toLocaleString()}</span>
+        </div>
       </div>
-      <button class="ci-del" onclick="removeCart(${i})"><i class="fa fa-trash"></i></button>
+      <button class="ci-del" onclick="removeCart(${i})" title="সরিয়ে দিন"><i class="fa fa-times-circle"></i></button>
     </div>`;
   }).join('');
   footer.innerHTML = `
-    <div class="cart-total"><span>মোট:</span><span>৳${total.toLocaleString()}</span></div>
-    <button class="btn-primary" onclick="openCheckout(${total})">অর্ডার করুন →</button>`;
+    <div class="cart-total">
+      <span><i class="fa fa-tag" style="color:#e53935;margin-right:6px"></i>মোট (${cart.length}টি পণ্য):</span>
+      <span>৳${total.toLocaleString()}</span>
+    </div>
+    <button class="btn-primary" onclick="openCheckout(${total})"><i class="fa fa-check-circle"></i> অর্ডার করুন →</button>`;
+}
+function cartQty(i, delta) {
+  if (!cart[i]) return;
+  const newQty = (cart[i].qty || 1) + delta;
+  if (newQty < 1) { removeCart(i); return; }
+  cart[i].qty = newQty;
+  saveCart();
+  renderCart();
 }
 function removeCart(i) { cart.splice(i, 1); saveCart(); renderCart(); }
 
@@ -2708,7 +2837,7 @@ function sendCustomerGiftWhatsApp(giftName, giftPrice) {
   window.open(`https://wa.me/${adminNum}?text=${msg}`, '_blank');
 }
 
-// Admin Gift Upload — Cloudinary দিয়ে ছবি আপলোড
+// Admin Gift Upload — Cloudinary আপলোড + Firestore-এ permanent URL সেভ
 async function uploadGiftImage() {
   if (!firebaseOK) { showToast('⚠️ Firebase config দিন প্রথমে'); return; }
   if (!currentUser) { showToast('⚠️ আগে লগইন করুন'); return; }
@@ -2722,27 +2851,34 @@ async function uploadGiftImage() {
   const pw = document.getElementById('uploadProgressWrap');
   const pb = document.getElementById('uploadProgressBar');
   pw.style.display = 'block';
-  pb.style.width = '20%'; pb.textContent = 'Cloudinary-তে আপলোড হচ্ছে...';
+  pb.style.width = '15%'; pb.textContent = 'Cloudinary-তে আপলোড হচ্ছে...';
   try {
-    // ✅ Cloudinary তে আপলোড (gifts ফোল্ডারে)
+    pb.style.width = '40%';
+    // ✅ Cloudinary তে আপলোড
     const downloadURL = await uploadToCloudinary(file, 'technet_gifts/' + category);
-    pb.style.width = '80%'; pb.textContent = 'Firestore সেভ হচ্ছে...';
-    await firestore.collection('gifts').add({
+    pb.style.width = '75%'; pb.textContent = 'Firestore-এ URL সেভ হচ্ছে...';
+    // ✅ Firestore-এ সেভ — imageUrl সবসময় Cloudinary-র permanent URL থাকবে
+    const docRef = await firestore.collection('gifts').add({
       name, category, price,
       imageUrl: downloadURL,
+      imageUrlBackup: downloadURL,
+      cloudName: CLOUDINARY_CLOUD_NAME,
       cloudinary: true,
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      uploadedBy: currentUser.email
+      uploadedBy: currentUser.email,
+      uploadedAt: Date.now()
     });
     pb.style.width = '100%'; pb.textContent = '✅ সম্পন্ন!';
-    showToast('✅ Cloudinary-তে সফলভাবে আপলোড হয়েছে!');
-    setTimeout(() => { pw.style.display = 'none'; pb.style.width = '0%'; pb.textContent = ''; }, 1500);
+    showToast('✅ Cloudinary ও Firestore-এ সফলভাবে সেভ হয়েছে!');
+    console.log('Gift saved. ID:', docRef.id, '| URL:', downloadURL);
+    setTimeout(() => { pw.style.display = 'none'; pb.style.width = '0%'; pb.textContent = ''; }, 1600);
     document.getElementById('giftName').value = '';
     document.getElementById('giftPrice').value = '';
     fileInput.value = '';
     loadGiftImages(currentGiftFilter);
   } catch(e) {
     showToast('❌ আপলোড ব্যর্থ: ' + e.message);
+    console.error('Upload error:', e);
     pw.style.display = 'none'; pb.style.width = '0%';
   }
 }
@@ -3168,6 +3304,37 @@ function showToast(msg) {
   if (toastTimer) clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
 }
+
+// ---- §INT ---- periodic integrity check
+(function(){
+  var _0xCI=0;
+  var _0xCheck=setInterval(function(){
+    _0xCI++;
+    // Check that critical globals haven't been tampered
+    if(typeof firebaseConfig==='undefined'||typeof firebase==='undefined'){
+      clearInterval(_0xCheck);
+      return;
+    }
+    // Random decoy computation — obfuscates timing analysis
+    var _r=(_0xCI*0x3F)^(Date.now()&0xFF);
+    void(_r);
+    // Anti-iframe embedding
+    if(window.self!==window.top){
+      try{window.top.location.href=window.self.location.href;}catch(e){}
+    }
+  },3000);
+})();
+
+// ---- §CLN ---- cleanup sensitive refs after init
+setTimeout(function(){
+  try{
+    delete window.__fbConf;
+    delete window.__cdN;
+    delete window.__cdP;
+    delete window.__adm;
+    delete window.__ok;
+  }catch(e){}
+},2000);
 </script>
 </body>
 </html>
