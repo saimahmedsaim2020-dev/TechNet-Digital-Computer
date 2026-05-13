@@ -221,6 +221,11 @@ footer{background:#212121;color:#ccc;padding:40px 20px 16px;margin-top:30px}
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:2000;display:none;align-items:center;justify-content:center}
 .overlay.open{display:flex}
 .modal{background:#fff;border-radius:10px;width:100%;max-width:440px;padding:32px;position:relative;max-height:90vh;overflow-y:auto}
+@media(max-width:480px){
+  .modal{padding:20px 16px;border-radius:12px 12px 0 0;position:fixed;bottom:0;left:0;right:0;max-width:100vw;max-height:92vh;border-radius:20px 20px 0 0}
+  .overlay{align-items:flex-end}
+  .checkout-modal{border-radius:16px 16px 0 0;position:fixed;bottom:0;left:0;right:0;max-width:100vw;max-height:92vh;border-radius:20px 20px 0 0}
+}
 .modal h2{font-size:20px;font-weight:800;color:#e53935;margin-bottom:6px}
 .modal p.sub{font-size:13px;color:#777;margin-bottom:20px}
 .modal-close{position:absolute;top:14px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:#aaa}
@@ -510,17 +515,22 @@ footer{background:#212121;color:#ccc;padding:40px 20px 16px;margin-top:30px}
   .pay-options{grid-template-columns:1fr}
 }
 @media(max-width:640px){
-  .navbar{padding:10px 12px;gap:10px}
+  .navbar{padding:8px 10px;gap:8px;flex-wrap:nowrap}
   .logo small{display:none}
-  .logo{font-size:18px}
+  .logo{font-size:17px;flex-shrink:0}
+  .search-wrap{flex:1;min-width:0;max-width:100%}
   .search-wrap select{display:none}
+  .search-wrap input{font-size:14px;padding:0 10px}
+  .search-wrap button{padding:0 14px}
+  .nav-icons{gap:10px;flex-shrink:0}
+  .nav-icons .nav-label{display:none}
+  .nav-icon i{font-size:18px}
   .products{grid-template-columns:repeat(2,1fr)}
   .gift-grid{grid-template-columns:repeat(2,1fr)}
   .cat-strip{grid-template-columns:repeat(4,1fr)}
   .footer-grid{grid-template-columns:1fr}
   .footer-bottom{flex-direction:column;gap:6px;text-align:center}
-  .hamburger{display:flex}
-  .nav-icons .nav-label{display:none}
+  .hamburger{display:flex;flex-shrink:0}
   .banner-text h2{font-size:20px}
   .banner-slide{padding:24px 20px;min-height:180px}
   .banner-img{font-size:60px}
@@ -532,12 +542,21 @@ footer{background:#212121;color:#ccc;padding:40px 20px 16px;margin-top:30px}
   .cat-item i{font-size:22px}
   .gift-tabs{gap:6px}
   .gift-tab{padding:7px 14px;font-size:12px}
+  .cat-bar{padding:0 8px}
+  .cat-bar a{padding:8px 10px;font-size:12px}
 }
 @media(max-width:400px){
   .products{grid-template-columns:repeat(2,1fr)}
   .gift-grid{grid-template-columns:repeat(2,1fr)}
   .banner-row{grid-template-columns:1fr}
   .cat-strip{grid-template-columns:repeat(4,1fr)}
+  .modal{padding:20px 16px;max-width:98vw}
+  .checkout-modal{padding:16px;max-width:98vw}
+  .product-name{font-size:12px}
+  .product-price{font-size:14px}
+  .product-img{font-size:44px}
+  .pay-options{grid-template-columns:1fr 1fr}
+  .form-group input,.form-group select,.form-group textarea{font-size:16px}
 }
 </style>
 </head>
@@ -600,11 +619,11 @@ footer{background:#212121;color:#ccc;padding:40px 20px 16px;margin-top:30px}
     <a class="nav-icon" onclick="showGiftSection()" style="color:#FFD600">
       <i class="fa fa-gift"></i><span class="nav-label">গিফট</span>
     </a>
+    <a class="nav-icon" onclick="openOrderHistory()" title="অর্ডার ট্র্যাকিং">
+      <i class="fa fa-truck"></i><span class="nav-label">অর্ডার ট্র্যাকিং</span>
+    </a>
     <a class="nav-icon" onclick="openWishlist()">
       <i class="fa fa-heart"></i><span class="nav-label">উইশলিস্ট</span>
-    </a>
-    <a class="nav-icon" onclick="openOrderHistory()" id="orderHistBtn" style="display:none">
-      <i class="fa fa-box"></i><span class="nav-label">অর্ডার</span>
     </a>
     <a class="nav-icon" href="technet-admin.html" id="adminNavBtn" style="display:none">
       <i class="fa fa-cog"></i><span class="nav-label">এডমিন</span>
@@ -635,10 +654,11 @@ footer{background:#212121;color:#ccc;padding:40px 20px 16px;margin-top:30px}
   <h3 style="margin-top:12px"><i class="fa fa-gift"></i> গিফট</h3>
   <a href="#" onclick="showGiftSection();closeMobileNav()"><i class="fa fa-mug-hot"></i> মগ / ক্রেস্ট / ফ্রেম</a>
   <h3 style="margin-top:12px"><i class="fa fa-user"></i> অ্যাকাউন্ট</h3>
-  <a href="#" onclick="openAuthModal();closeMobileNav()" id="mobileLoginLink"><i class="fa fa-sign-in-alt"></i> লগইন / সাইনআপ</a>
+  <a href="#" onclick="openAuthModal();closeMobileNav()" id="mobileLoginLink"><i class="fa fa-sign-in-alt"></i> লগইন</a>
   <a href="#" onclick="openAccountSettings();closeMobileNav()" id="mobileAccSettings" style="display:none"><i class="fa fa-user-cog"></i> অ্যাকাউন্ট সেটিংস</a>
   <a href="#" onclick="openOrderHistory();closeMobileNav()" id="mobileOrderLink" style="display:none"><i class="fa fa-box"></i> আমার অর্ডার</a>
   <a href="#" onclick="openCart();closeMobileNav()"><i class="fa fa-shopping-cart"></i> কার্ট</a>
+  <a href="#" onclick="openOrderHistory();closeMobileNav()"><i class="fa fa-truck"></i> অর্ডার ট্র্যাকিং</a>
   <a href="#" onclick="openWishlist();closeMobileNav()"><i class="fa fa-heart"></i> উইশলিস্ট</a>
   <a href="technet-admin.html" id="mobileAdminLink" style="display:none"><i class="fa fa-cog"></i> এডমিন প্যানেল</a>
   <a href="#" onclick="doLogout();closeMobileNav()" id="mobileLogoutLink" style="display:none;color:#c62828"><i class="fa fa-sign-out-alt" style="color:#c62828"></i> লগআউট</a>
@@ -947,35 +967,66 @@ footer{background:#212121;color:#ccc;padding:40px 20px 16px;margin-top:30px}
 
 <!-- =================== MODALS =================== -->
 
-<!-- AUTH MODAL -->
+<!-- AUTH MODAL — Google + Facebook + GitHub + Email/Password -->
 <div class="overlay" id="authOverlay">
-  <div class="modal">
+  <div class="modal" style="max-width:420px;padding:28px 24px">
     <button class="modal-close" onclick="closeModal('authOverlay')">✕</button>
+
+    <!-- LOGIN FORM -->
     <div id="loginForm">
-      <h2>লগইন করুন</h2>
+      <h2 style="font-size:20px;margin-bottom:4px">লগইন করুন</h2>
       <p class="sub">আপনার অ্যাকাউন্টে প্রবেশ করুন</p>
-      <button class="btn-google" onclick="doGoogleLogin()">
+
+      <!-- Social logins -->
+      <button class="btn-google" onclick="doGoogleLogin()" style="margin-bottom:8px">
         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
-        Google দিয়ে লগইন করুন
+        Google দিয়ে লগইন
       </button>
+      <button onclick="doFacebookLogin()" style="display:flex;align-items:center;gap:8px;background:#1877F2;color:#fff;border:none;padding:10px 16px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;width:100%;justify-content:center;margin-bottom:8px;transition:box-shadow .2s">
+        <i class="fab fa-facebook-f" style="font-size:18px"></i> Facebook দিয়ে লগইন
+      </button>
+      <button onclick="doGithubLogin()" style="display:flex;align-items:center;gap:8px;background:#24292e;color:#fff;border:none;padding:10px 16px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;width:100%;justify-content:center;margin-bottom:4px;transition:box-shadow .2s">
+        <i class="fab fa-github" style="font-size:18px"></i> GitHub দিয়ে লগইন
+      </button>
+
       <div class="or-divider">অথবা ইমেইল দিয়ে</div>
+
       <div class="form-group"><label>ইমেইল</label><input type="email" id="loginEmail" placeholder="আপনার ইমেইল"></div>
-      <div class="form-group"><label>পাসওয়ার্ড</label><input type="password" id="loginPass" placeholder="পাসওয়ার্ড"></div>
+      <div class="form-group" style="position:relative">
+        <label>পাসওয়ার্ড</label>
+        <input type="password" id="loginPass" placeholder="পাসওয়ার্ড" onkeypress="if(event.key==='Enter')doLogin()">
+        <span onclick="togglePass('loginPass',this)" style="position:absolute;right:12px;bottom:10px;cursor:pointer;color:#aaa;font-size:14px"><i class="fa fa-eye"></i></span>
+      </div>
       <button class="btn-primary" onclick="doLogin()">লগইন করুন</button>
       <div class="switch-auth">অ্যাকাউন্ট নেই? <a onclick="switchToSignup()">সাইনআপ করুন</a></div>
     </div>
+
+    <!-- SIGNUP FORM -->
     <div id="signupForm" style="display:none">
-      <h2>নতুন অ্যাকাউন্ট</h2>
+      <h2 style="font-size:20px;margin-bottom:4px">নতুন অ্যাকাউন্ট</h2>
       <p class="sub">আজই রেজিস্ট্রেশন করুন</p>
-      <button class="btn-google" onclick="doGoogleLogin()">
+
+      <button class="btn-google" onclick="doGoogleLogin()" style="margin-bottom:8px">
         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
-        Google দিয়ে সাইনআপ করুন
+        Google দিয়ে সাইনআপ
       </button>
+      <button onclick="doFacebookLogin()" style="display:flex;align-items:center;gap:8px;background:#1877F2;color:#fff;border:none;padding:10px 16px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;width:100%;justify-content:center;margin-bottom:8px">
+        <i class="fab fa-facebook-f" style="font-size:18px"></i> Facebook দিয়ে সাইনআপ
+      </button>
+      <button onclick="doGithubLogin()" style="display:flex;align-items:center;gap:8px;background:#24292e;color:#fff;border:none;padding:10px 16px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;width:100%;justify-content:center;margin-bottom:4px">
+        <i class="fab fa-github" style="font-size:18px"></i> GitHub দিয়ে সাইনআপ
+      </button>
+
       <div class="or-divider">অথবা ইমেইল দিয়ে</div>
-      <div class="form-group"><label>পুরো নাম</label><input type="text" id="regName" placeholder="আপনার নাম"></div>
-      <div class="form-group"><label>ইমেইল</label><input type="email" id="regEmail" placeholder="আপনার ইমেইল"></div>
-      <div class="form-group"><label>ফোন নম্বর</label><input type="tel" id="regPhone" placeholder="01XXXXXXXXX"></div>
-      <div class="form-group"><label>পাসওয়ার্ড</label><input type="password" id="regPass" placeholder="পাসওয়ার্ড (ন্যূনতম ৬ অক্ষর)"></div>
+
+      <div class="form-group"><label>পুরো নাম *</label><input type="text" id="regName" placeholder="আপনার পুরো নাম"></div>
+      <div class="form-group"><label>ইমেইল *</label><input type="email" id="regEmail" placeholder="আপনার ইমেইল"></div>
+      <div class="form-group"><label>ফোন নম্বর *</label><input type="tel" id="regPhone" placeholder="01XXXXXXXXX"></div>
+      <div class="form-group" style="position:relative">
+        <label>পাসওয়ার্ড * <span style="font-size:11px;color:#aaa">(ন্যূনতম ৬ অক্ষর)</span></label>
+        <input type="password" id="regPass" placeholder="পাসওয়ার্ড">
+        <span onclick="togglePass('regPass',this)" style="position:absolute;right:12px;bottom:10px;cursor:pointer;color:#aaa;font-size:14px"><i class="fa fa-eye"></i></span>
+      </div>
       <button class="btn-primary" onclick="doSignup()">অ্যাকাউন্ট তৈরি করুন</button>
       <div class="switch-auth">ইতিমধ্যে অ্যাকাউন্ট আছে? <a onclick="switchToLogin()">লগইন করুন</a></div>
     </div>
@@ -1068,10 +1119,12 @@ footer{background:#212121;color:#ccc;padding:40px 20px 16px;margin-top:30px}
           <div style="font-size:11px;color:#888;flex:1">১০ মিনিটের মধ্যে পেমেন্ট করুন। নইলে অর্ডার বাতিল হয়ে যাবে।</div>
         </div>
         <div class="form-group">
-          <label>TXN / Transaction ID *</label>
-          <input type="text" id="coTxId" placeholder="পেমেন্টের পর Transaction ID লিখুন">
+          <label>TNX কোড *  <span style="font-size:11px;color:#e53935;font-weight:400">(Admin-এর দেওয়া কোড)</span></label>
+          <input type="text" id="coTxId" placeholder="আপনার সঠিক TNX কোড দিন" style="text-transform:uppercase;letter-spacing:1px">
         </div>
-        <div style="font-size:12px;color:#888;margin-bottom:12px">পেমেন্ট করার পর মোবাইলে আসা Transaction ID দিন</div>
+        <div style="font-size:12px;color:#555;margin-bottom:12px;background:#e8f5e9;padding:10px 12px;border-radius:6px;border-left:3px solid #43a047">
+          ✅ আপনার সঠিক TNX কোড দিন এবং কিছুক্ষণ অপেক্ষা করুন — যাচাই হলে অর্ডার কনফার্ম হবে।
+        </div>
       </div>
       <!-- Coupon -->
       <div style="font-size:13px;font-weight:700;margin-bottom:8px;color:#333">🎟 কুপন কোড</div>
@@ -1217,21 +1270,37 @@ footer{background:#212121;color:#ccc;padding:40px 20px 16px;margin-top:30px}
     <p id="accEmailShow" style="font-size:12px;color:#888;margin-bottom:16px"></p>
     <div class="account-tabs">
       <button class="account-tab active" onclick="switchAccTab('orders',this)"><i class="fa fa-box"></i> অর্ডার</button>
-      <button class="account-tab" onclick="switchAccTab('password',this)"><i class="fa fa-lock"></i> পাসওয়ার্ড</button>
+      <button class="account-tab" onclick="switchAccTab('profile',this)"><i class="fa fa-user"></i> প্রোফাইল</button>
+      <button class="account-tab" id="passTabBtn" onclick="switchAccTab('password',this)"><i class="fa fa-lock"></i> পাসওয়ার্ড</button>
       <button class="account-tab" onclick="switchAccTab('delete',this)"><i class="fa fa-trash"></i> ডিলিট</button>
     </div>
     <div class="account-tab-panel active" id="accTab_orders">
       <div id="accOrderMini" style="max-height:340px;overflow-y:auto"></div>
     </div>
+    <div class="account-tab-panel" id="accTab_profile">
+      <div style="text-align:center;padding:20px 0">
+        <div id="accProfilePhoto" style="margin-bottom:10px"></div>
+        <div style="font-size:16px;font-weight:700" id="accProfileName"></div>
+        <div style="font-size:13px;color:#888;margin-bottom:14px" id="accProfileEmail"></div>
+        <div style="background:#f5f5f5;border-radius:8px;padding:10px 14px;font-size:12px;color:#888;text-align:left" id="accLoginMethodNote"></div>
+      </div>
+    </div>
     <div class="account-tab-panel" id="accTab_password">
-      <div class="form-group" style="margin-bottom:14px"><label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px">নতুন পাসওয়ার্ড</label><input type="password" id="newPassInput" placeholder="কমপক্ষে ৬ অক্ষর" style="width:100%;padding:10px 12px;border:1.5px solid #e0e0e0;border-radius:6px;font-size:13px;outline:none"></div>
-      <div class="form-group" style="margin-bottom:14px"><label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px">পাসওয়ার্ড নিশ্চিত করুন</label><input type="password" id="newPassConfirm" placeholder="আবার লিখুন" style="width:100%;padding:10px 12px;border:1.5px solid #e0e0e0;border-radius:6px;font-size:13px;outline:none"></div>
-      <button class="btn-primary" onclick="changePassword()"><i class="fa fa-save"></i> পাসওয়ার্ড পরিবর্তন করুন</button>
+      <div id="passTabNote" style="background:#fff3e0;border-radius:8px;padding:10px 14px;font-size:12px;color:#E65100;margin-bottom:14px;display:none">
+        Social লগইন ব্যবহারকারীরা পাসওয়ার্ড পরিবর্তন করতে পারবেন না।
+      </div>
+      <div id="passTabForm">
+        <div class="form-group" style="margin-bottom:14px"><label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px">নতুন পাসওয়ার্ড</label><input type="password" id="newPassInput" placeholder="কমপক্ষে ৬ অক্ষর" style="width:100%;padding:10px 12px;border:1.5px solid #e0e0e0;border-radius:6px;font-size:13px;outline:none"></div>
+        <div class="form-group" style="margin-bottom:14px"><label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px">পাসওয়ার্ড নিশ্চিত করুন</label><input type="password" id="newPassConfirm" placeholder="আবার লিখুন" style="width:100%;padding:10px 12px;border:1.5px solid #e0e0e0;border-radius:6px;font-size:13px;outline:none"></div>
+        <button class="btn-primary" onclick="changePassword()"><i class="fa fa-save"></i> পাসওয়ার্ড পরিবর্তন করুন</button>
+      </div>
     </div>
     <div class="account-tab-panel" id="accTab_delete">
       <div class="danger-zone">
         <p>⚠️ অ্যাকাউন্ট ডিলিট করলে আপনার সব ডেটা স্থায়ীভাবে মুছে যাবে। এই কাজ পূর্বাবস্থায় ফেরানো যাবে না।</p>
-        <div style="margin-bottom:10px"><label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px">নিশ্চিত করতে পাসওয়ার্ড দিন</label><input type="password" id="delPassInput" placeholder="আপনার পাসওয়ার্ড" style="width:100%;padding:10px 12px;border:1.5px solid #ffcdd2;border-radius:6px;font-size:13px;outline:none"></div>
+        <div style="background:#fff3e0;border-radius:8px;padding:10px 14px;font-size:12px;color:#E65100;margin-bottom:14px">
+          ⚠️ ইমেইল অ্যাকাউন্ট হলে পাসওয়ার্ড চাওয়া হবে। Social অ্যাকাউন্ট হলে পুনরায় লগইন করতে হবে।
+        </div>
         <button class="btn-danger" onclick="deleteAccount()"><i class="fa fa-trash-alt"></i> অ্যাকাউন্ট স্থায়ীভাবে ডিলিট করুন</button>
       </div>
     </div>
@@ -1286,8 +1355,9 @@ const firebaseConfig = {
 };
 
 // 🌤️ CLOUDINARY CONFIG
-const CLOUDINARY_CLOUD_NAME = 'drwjjz7l7';
-const CLOUDINARY_UPLOAD_PRESET = '956395631878227'; // unsigned upload preset
+const CLOUDINARY_CLOUD_NAME = 'dbi612vqa';
+const CLOUDINARY_UPLOAD_PRESET = 'technet_upload'; // Admin: Cloudinary dashboard-এ unsigned preset তৈরি করুন
+const CLOUDINARY_API_KEY = '496393635447177'; // API Key (upload preset-এ লাগবে না, reference only)
 const CLOUDINARY_BASE_URL = `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/`;
 
 // Cloudinary তে ছবি আপলোড করার ফাংশন
@@ -1389,6 +1459,25 @@ function clearSearch() {
 // ============================================================
 // FIREBASE INIT
 // ============================================================
+/*
+  ⚠️ Firebase Realtime Database Rules (Firebase Console → Database → Rules):
+  {
+    "rules": {
+      "products":    { ".read": true,  ".write": "auth != null && root.child('admins/'+auth.uid).exists()" },
+      "orders":      { ".read": "auth != null && root.child('admins/'+auth.uid).exists()", ".write": "auth != null",
+                       "$orderId": { ".read": "auth != null && data.child('userId').val() === auth.uid" } },
+      "userOrders":  { "$uid": { ".read": "auth != null && auth.uid === $uid", ".write": "auth != null && auth.uid === $uid" } },
+      "tnxCodes":    { ".read": "auth != null", ".write": "auth != null && root.child('admins/'+auth.uid).exists()" },
+      "users":       { "$uid": { ".read": "auth != null && auth.uid === $uid", ".write": "auth != null && auth.uid === $uid" } },
+      "carts":       { "$uid": { ".read": "auth != null && auth.uid === $uid", ".write": "auth != null && auth.uid === $uid" } },
+      "settings":    { ".read": true,  ".write": "auth != null && root.child('admins/'+auth.uid).exists()" },
+      "coupons":     { ".read": "auth != null", ".write": "auth != null && root.child('admins/'+auth.uid).exists()" },
+      "admins":      { ".read": "auth != null", ".write": false },
+      "giftItems":   { ".read": true,  ".write": "auth != null && root.child('admins/'+auth.uid).exists()" },
+      "chats":       { ".read": "auth != null && root.child('admins/'+auth.uid).exists()", "$uid": { ".read": "auth != null && auth.uid === $uid", ".write": "auth != null && auth.uid === $uid" } }
+    }
+  }
+*/
 try {
   firebase.initializeApp(firebaseConfig);
   db = firebase.database();
@@ -1535,48 +1624,119 @@ function confirmLogout() {
 }
 
 // ============================================================
-// GOOGLE LOGIN
+// AUTH — Google + Facebook + GitHub + Email/Password
 // ============================================================
+
+// পাসওয়ার্ড দেখানো/লুকানো
+function togglePass(inputId, iconEl) {
+  const inp = document.getElementById(inputId);
+  if (!inp) return;
+  if (inp.type === 'password') { inp.type = 'text'; iconEl.innerHTML = '<i class="fa fa-eye-slash"></i>'; }
+  else { inp.type = 'password'; iconEl.innerHTML = '<i class="fa fa-eye"></i>'; }
+}
+
+// Social login helper — saves user to Firebase on first login
+function _afterSocialLogin(user) {
+  closeModal('authOverlay');
+  showToast('✅ স্বাগতম, ' + (user.displayName || 'ব্যবহারকারী') + '!');
+  if (firebaseOK) {
+    db.ref(`users/${user.uid}`).once('value', snap => {
+      if (!snap.exists()) {
+        db.ref(`users/${user.uid}`).set({
+          name: user.displayName || '',
+          email: user.email || '',
+          photoURL: user.photoURL || '',
+          createdAt: Date.now(),
+          loginMethod: 'social'
+        });
+      }
+    });
+  }
+}
+
+// Google Login
 function doGoogleLogin() {
   if (!firebaseOK) { showToast('⚠️ Firebase config দিন প্রথমে'); return; }
-  const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider)
-    .then(result => {
-      closeModal('authOverlay');
-      showToast('✅ Google দিয়ে লগইন সফল! স্বাগতম, ' + result.user.displayName);
-    })
+  auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
+    .then(r => _afterSocialLogin(r.user))
     .catch(e => showToast('❌ Google লগইন ব্যর্থ: ' + e.message));
 }
+
+// Facebook Login
+function doFacebookLogin() {
+  if (!firebaseOK) { showToast('⚠️ Firebase config দিন প্রথমে'); return; }
+  const provider = new firebase.auth.FacebookAuthProvider();
+  auth.signInWithPopup(provider)
+    .then(r => _afterSocialLogin(r.user))
+    .catch(e => {
+      if (e.code === 'auth/account-exists-with-different-credential') {
+        showToast('❌ এই ইমেইলে অন্য পদ্ধতিতে অ্যাকাউন্ট আছে। Google বা ইমেইল দিয়ে লগইন করুন।');
+      } else {
+        showToast('❌ Facebook লগইন ব্যর্থ: ' + e.message);
+      }
+    });
+}
+
+// GitHub Login
+function doGithubLogin() {
+  if (!firebaseOK) { showToast('⚠️ Firebase config দিন প্রথমে'); return; }
+  auth.signInWithPopup(new firebase.auth.GithubAuthProvider())
+    .then(r => _afterSocialLogin(r.user))
+    .catch(e => {
+      if (e.code === 'auth/account-exists-with-different-credential') {
+        showToast('❌ এই ইমেইলে অন্য পদ্ধতিতে অ্যাকাউন্ট আছে।');
+      } else {
+        showToast('❌ GitHub লগইন ব্যর্থ: ' + e.message);
+      }
+    });
+}
+
+// Email/Password Login
 function doLogin() {
   if (!firebaseOK) { showToast('Firebase কানেক্ট করুন প্রথমে'); return; }
   const email = document.getElementById('loginEmail').value.trim();
-  const pass = document.getElementById('loginPass').value;
+  const pass  = document.getElementById('loginPass').value;
   if (!email || !pass) { showToast('ইমেইল ও পাসওয়ার্ড দিন'); return; }
   auth.signInWithEmailAndPassword(email, pass)
     .then(() => { closeModal('authOverlay'); showToast('✅ লগইন সফল!'); })
     .catch(e => showToast('❌ ' + getBnError(e.code)));
 }
+
+// Email/Password Signup (name + email + phone + password)
 function doSignup() {
   if (!firebaseOK) { showToast('Firebase কানেক্ট করুন প্রথমে'); return; }
-  const name = document.getElementById('regName').value.trim();
+  const name  = document.getElementById('regName').value.trim();
   const email = document.getElementById('regEmail').value.trim();
   const phone = document.getElementById('regPhone').value.trim();
-  const pass = document.getElementById('regPass').value;
-  if (!name || !email || !pass) { showToast('সব ঘর পূরণ করুন'); return; }
-  if (pass.length < 6) { showToast('পাসওয়ার্ড কমপক্ষে ৬ অক্ষর'); return; }
+  const pass  = document.getElementById('regPass').value;
+  if (!name || !email || !phone || !pass) { showToast('সব ঘর পূরণ করুন'); return; }
+  if (phone.length < 11) { showToast('সঠিক ফোন নম্বর দিন (11 সংখ্যা)'); return; }
+  if (pass.length < 6)   { showToast('পাসওয়ার্ড কমপক্ষে ৬ অক্ষর'); return; }
   auth.createUserWithEmailAndPassword(email, pass)
     .then(cred => {
       cred.user.updateProfile({ displayName: name });
-      db.ref(`users/${cred.user.uid}`).set({ name, email, phone, createdAt: Date.now() });
+      if (firebaseOK) {
+        db.ref(`users/${cred.user.uid}`).set({ name, email, phone, createdAt: Date.now(), loginMethod: 'email' });
+      }
       closeModal('authOverlay');
-      showToast('✅ অ্যাকাউন্ট তৈরি হয়েছে!');
+      showToast('✅ অ্যাকাউন্ট তৈরি হয়েছে! স্বাগতম ' + name);
     })
     .catch(e => showToast('❌ ' + getBnError(e.code)));
 }
+
 function getBnError(code) {
-  const map = {'auth/wrong-password':'ভুল পাসওয়ার্ড','auth/user-not-found':'অ্যাকাউন্ট পাওয়া যায়নি','auth/email-already-in-use':'ইমেইল ইতিমধ্যে ব্যবহৃত','auth/invalid-email':'ভুল ইমেইল ফরম্যাট'};
+  const map = {
+    'auth/wrong-password'         : 'ভুল পাসওয়ার্ড',
+    'auth/user-not-found'         : 'অ্যাকাউন্ট পাওয়া যায়নি',
+    'auth/email-already-in-use'   : 'ইমেইল ইতিমধ্যে ব্যবহৃত',
+    'auth/invalid-email'          : 'ভুল ইমেইল ফরম্যাট',
+    'auth/weak-password'          : 'পাসওয়ার্ড দুর্বল, আরও শক্তিশালী করুন',
+    'auth/too-many-requests'      : 'অনেকবার চেষ্টা হয়েছে। একটু পরে আবার করুন',
+    'auth/invalid-credential'     : 'ইমেইল বা পাসওয়ার্ড ভুল',
+  };
   return map[code] || 'কিছু একটা ভুল হয়েছে';
 }
+
 function openAuthModal() {
   if (currentUser) { toggleUserMenu(); return; }
   openModal('authOverlay');
@@ -2008,7 +2168,7 @@ function goToStep2() {
 function goToStep3() {
   const isCOD = selectedPayMethod === 'cod';
   const txId = document.getElementById('coTxId').value.trim();
-  if (!isCOD && !txId) { showToast('Transaction ID দিন'); return; }
+  if (!isCOD && !txId) { showToast('⚠️ Transaction ID / TNX কোড দিন'); return; }
   // Show summary
   buildConfirmSummary();
   document.getElementById('coStep1').style.display = 'none';
@@ -2135,7 +2295,7 @@ function placeOrder() {
   const phone = document.getElementById('coPhone').value.trim();
   const addr = document.getElementById('coAddr').value.trim();
   const note = document.getElementById('coNote').value.trim();
-  const txId = document.getElementById('coTxId').value.trim();
+  const txId = document.getElementById('coTxId').value.trim().toUpperCase();
   if (!name || !phone || !addr) { showToast('সব তথ্য পূরণ করুন'); return; }
   const isCOD = selectedPayMethod === 'cod';
   if (!isCOD && !txId) { showToast('Transaction ID দিন'); return; }
@@ -2143,8 +2303,51 @@ function placeOrder() {
   const grand = checkoutTotal + checkoutDeliveryFee - checkoutDiscount;
   const orderId = 'TN' + Date.now();
 
-  // COD হলে সরাসরি confirmed, online payment হলে pending_payment
-  const initialStatus = isCOD ? 'pending' : 'pending_payment';
+  // COD হলে সরাসরি pending, online payment হলে TNX যাচাই করো
+  if (isCOD) {
+    _saveFinalOrder({ orderId, name, phone, addr, note, txId: 'COD', grand, isCOD: true });
+    return;
+  }
+
+  // 🔒 TNX যাচাই: Firebase-এ admin-দেওয়া TNX কোড চেক করো
+  if (!firebaseOK) { showToast('❌ Firebase সংযোগ নেই'); return; }
+
+  const btnConfirm = document.querySelector('#coStep3 .btn-primary');
+  if (btnConfirm) { btnConfirm.disabled = true; btnConfirm.innerHTML = '<i class="fa fa-spinner fa-spin"></i> আপনার সঠিক TNX কোড যাচাই হচ্ছে, কিছুক্ষণ অপেক্ষা করুন...'; }
+
+  db.ref(`tnxCodes/${txId}`).once('value', snap => {
+    if (btnConfirm) { btnConfirm.disabled = false; btnConfirm.innerHTML = '<i class="fa fa-check-circle"></i> অর্ডার দিন'; }
+
+    if (!snap.exists()) {
+      showToast('❌ TNX কোড ভুল! Admin-দেওয়া সঠিক কোড দিন।');
+      return;
+    }
+
+    const tnxData = snap.val();
+
+    // ইতিমধ্যে ব্যবহার হয়েছে কিনা চেক
+    if (tnxData.used === true) {
+      showToast('❌ এই TNX কোডটি ইতিমধ্যে ব্যবহার হয়েছে! একটি কোড শুধু একবার ব্যবহার করা যাবে।');
+      return;
+    }
+
+    // মিলে গেছে — TNX কোড used মার্ক করো (একবার ব্যবহারের নিয়ম)
+    db.ref(`tnxCodes/${txId}`).update({
+      used: true,
+      usedBy: currentUser ? currentUser.uid : 'guest',
+      usedAt: Date.now(),
+      usedForOrder: orderId
+    }).then(() => {
+      _saveFinalOrder({ orderId, name, phone, addr, note, txId, grand, isCOD: false, tnxVerified: true });
+    }).catch(() => {
+      showToast('❌ TNX কোড আপডেটে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
+    });
+  });
+}
+
+// অর্ডার Firebase-এ সেভ করো এবং ইমেইল পাঠাও
+function _saveFinalOrder({ orderId, name, phone, addr, note, txId, grand, isCOD, tnxVerified }) {
+  const initialStatus = isCOD ? 'pending' : 'confirmed';
 
   const order = {
     orderId, name, phone, addr, note, items: cart, total: checkoutTotal,
@@ -2152,33 +2355,33 @@ function placeOrder() {
     deliveryType: selectedDelivery, paymentMethod: selectedPayMethod,
     txId: txId || 'COD', coupon: appliedCoupon || '',
     status: initialStatus,
-    txnVerified: false,
+    txnVerified: tnxVerified || false,
     userId: currentUser ? currentUser.uid : 'guest',
+    userEmail: currentUser ? currentUser.email : '',
     createdAt: Date.now(),
     paymentDeadline: isCOD ? null : (Date.now() + 10 * 60 * 1000)
   };
 
   if (firebaseOK) {
-    db.ref(`orders/${orderId}`).set(order).then(() => {
+    // ✅ দুই জায়গায় সেভ করো:
+    // 1. orders/{orderId}  — admin সব দেখবে
+    // 2. userOrders/{uid}/{orderId}  — user নিজেরটা দেখবে (index ছাড়াই)
+    const updates = {};
+    updates[`orders/${orderId}`] = order;
+    if (currentUser) {
+      updates[`userOrders/${currentUser.uid}/${orderId}`] = order;
+    }
+
+    db.ref().update(updates).then(() => {
       cart = []; saveCart(); closeModal('checkoutOverlay');
       clearPaymentTimer();
       if (!isCOD) {
-        showToast('✅ অর্ডার রেকর্ড হয়েছে! এডমিন TXN যাচাই করবে।');
-        setTimeout(() => {
-          db.ref(`orders/${orderId}`).once('value', snap => {
-            if (snap.exists() && snap.val().status === 'pending_payment') {
-              db.ref(`orders/${orderId}/status`).set('cancelled');
-              db.ref(`orders/${orderId}/cancelReason`).set('১০ মিনিটে TXN যাচাই না হওয়ায় অটো বাতিল');
-            }
-          });
-        }, 10 * 60 * 1000);
+        showToast('✅ পেমেন্ট যাচাই হয়েছে! অর্ডার কনফার্ম হয়েছে। ইমেইল চেক করুন।');
       } else {
-        showToast('✅ অর্ডার সফল! এডমিন নিশ্চিত করলে আপডেট পাবেন।');
+        showToast('✅ অর্ডার সফল! ডেলিভারিতে পেমেন্ট করবেন।');
       }
       generateReceipt(order);
-      // ✉️ ইমেইল পাঠাও
       sendOrderConfirmEmail(order);
-      // 📱 গিফট আইটেম থাকলে WhatsApp-এ পাঠাও
       const giftItems = order.items.filter(i => (i.id||'').startsWith('gift_'));
       if (giftItems.length > 0) {
         setTimeout(() => {
@@ -2187,7 +2390,7 @@ function placeOrder() {
           }
         }, 800);
       }
-    }).catch(() => showToast('❌ অর্ডার সংরক্ষণে ত্রুটি'));
+    }).catch(e => showToast('❌ অর্ডার সংরক্ষণে ত্রুটি: ' + e.message));
   } else {
     cart = []; updateCartBadge(); closeModal('checkoutOverlay'); generateReceipt(order);
     showToast('✅ অর্ডার নিশ্চিত!');
@@ -2196,75 +2399,183 @@ function placeOrder() {
 }
 
 // ============================================================
-// ORDER HISTORY
+// ORDER HISTORY — userOrders path থেকে লোড (সবচেয়ে নির্ভরযোগ্য)
 // ============================================================
 function openOrderHistory() {
-  if (!currentUser) { showToast('অর্ডার দেখতে লগইন করুন'); openModal('authOverlay'); return; }
+  if (!currentUser) {
+    // লগইন না থাকলে modal খুলে login বলো
+    openModal('orderHistoryOverlay');
+    document.getElementById('orderHistoryList').innerHTML = `
+      <div style="text-align:center;padding:40px 20px">
+        <div style="font-size:56px;margin-bottom:12px">📦</div>
+        <div style="font-size:16px;font-weight:700;color:#333;margin-bottom:8px">অর্ডার ট্র্যাক করুন</div>
+        <div style="font-size:13px;color:#888;margin-bottom:20px">আপনার অর্ডারের অবস্থা দেখতে প্রথমে লগইন করুন</div>
+        <button onclick="closeModal('orderHistoryOverlay');openAuthModal()" class="btn-primary" style="width:auto;padding:11px 28px">
+          <i class="fa fa-sign-in-alt"></i> লগইন করুন
+        </button>
+      </div>`;
+    return;
+  }
   openModal('orderHistoryOverlay');
   loadOrderHistory('all');
 }
+
 function loadOrderHistory(filter) {
   const el = document.getElementById('orderHistoryList');
-  el.innerHTML = '<div style="text-align:center;padding:30px"><div class="gift-spinner" style="margin:0 auto;border-top-color:#e53935"></div></div>';
-  if (!firebaseOK) { el.innerHTML = '<div style="text-align:center;padding:30px;color:#999">Firebase সংযোগ নেই</div>'; return; }
-  db.ref('orders').orderByChild('userId').equalTo(currentUser.uid).once('value', snap => {
+  el.innerHTML = '<div style="text-align:center;padding:30px"><div class="gift-spinner" style="margin:0 auto;border-top-color:#e53935"></div><div style="font-size:13px;color:#aaa;margin-top:10px">অর্ডার লোড হচ্ছে...</div></div>';
+
+  if (!firebaseOK) {
+    el.innerHTML = '<div style="text-align:center;padding:30px;color:#999"><i class="fa fa-wifi" style="font-size:30px;color:#ddd;display:block;margin-bottom:8px"></i>Firebase সংযোগ নেই</div>';
+    return;
+  }
+
+  // ✅ userOrders থেকে অর্ডার তুলি, তারপর orders/ থেকে latest status sync করি
+  db.ref(`userOrders/${currentUser.uid}`).once('value', snap => {
     allUserOrders = [];
-    snap.forEach(child => allUserOrders.push(child.val()));
-    allUserOrders.sort((a,b) => b.createdAt - a.createdAt);
-    renderOrderHistory(filter);
+    if (snap.exists()) {
+      snap.forEach(child => {
+        const o = child.val();
+        if (o && o.orderId) allUserOrders.push(o);
+      });
+    }
+    allUserOrders.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+    if (!allUserOrders.length) {
+      // পুরনো path fallback
+      db.ref('orders').orderByChild('userId').equalTo(currentUser.uid).once('value', snap2 => {
+        snap2.forEach(child => {
+          const o = child.val();
+          if (o && o.orderId) allUserOrders.push(o);
+        });
+        allUserOrders.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+        _syncOrderStatuses(filter);
+      }, () => renderOrderHistory(filter));
+    } else {
+      _syncOrderStatuses(filter);
+    }
+  }, err => {
+    console.warn('Order load error:', err);
+    el.innerHTML = '<div style="text-align:center;padding:30px;color:#e53935"><i class="fa fa-exclamation-circle" style="font-size:30px;display:block;margin-bottom:8px"></i>অর্ডার লোড করতে সমস্যা হয়েছে। পুনরায় চেষ্টা করুন।</div>';
   });
 }
+
+// Admin orders/ path থেকে latest status pull করো (status mismatch ঠিক করে)
+function _syncOrderStatuses(filter) {
+  if (!allUserOrders.length) { renderOrderHistory(filter); return; }
+  let done = 0;
+  allUserOrders.forEach((order, idx) => {
+    db.ref(`orders/${order.orderId}/status`).once('value', snap => {
+      if (snap.exists()) {
+        allUserOrders[idx].status = snap.val(); // admin-আপডেট করা status নাও
+      }
+      done++;
+      if (done === allUserOrders.length) renderOrderHistory(filter);
+    }, () => {
+      done++;
+      if (done === allUserOrders.length) renderOrderHistory(filter);
+    });
+  });
+}
+
 function filterOrders(filter, btn) {
-  document.querySelectorAll('#orderHistoryOverlay .gift-tab').forEach(t => { t.classList.remove('active'); t.style.borderColor='#ce93d8'; t.style.color='#7b1fa2'; });
+  document.querySelectorAll('#orderHistoryOverlay .gift-tab').forEach(t => {
+    t.classList.remove('active'); t.style.borderColor='#ce93d8'; t.style.color='#7b1fa2';
+  });
   btn.classList.add('active'); btn.style.borderColor='#e53935'; btn.style.color='#e53935';
   renderOrderHistory(filter);
 }
+
 function renderOrderHistory(filter) {
   const el = document.getElementById('orderHistoryList');
   let orders = allUserOrders;
   if (filter !== 'all') orders = orders.filter(o => o.status === filter);
+
   if (!orders.length) {
-    el.innerHTML = '<div style="text-align:center;padding:40px;color:#999"><i class="fa fa-box" style="font-size:40px;color:#ddd;display:block;margin-bottom:12px"></i>কোনো অর্ডার নেই</div>';
+    const msg = filter === 'all'
+      ? '<i class="fa fa-box" style="font-size:40px;color:#ddd;display:block;margin-bottom:12px"></i>এখনো কোনো অর্ডার নেই'
+      : `<i class="fa fa-filter" style="font-size:30px;color:#ddd;display:block;margin-bottom:8px"></i>এই ক্যাটাগরিতে কোনো অর্ডার নেই`;
+    el.innerHTML = `<div style="text-align:center;padding:40px;color:#999">${msg}</div>`;
     return;
   }
-  const statusMap = {pending:{label:'অপেক্ষমান',cls:'status-pending'},pending_payment:{label:'💳 পেমেন্ট যাচাই হচ্ছে',cls:'status-pending'},confirmed:{label:'নিশ্চিত',cls:'status-confirmed'},shipped:{label:'পাঠানো হয়েছে',cls:'status-shipped'},delivered:{label:'পৌঁছেছে',cls:'status-delivered'},cancelled:{label:'বাতিল',cls:'status-cancelled'}};
+
+  const statusMap = {
+    pending:         { label:'⏳ অপেক্ষমান',           cls:'status-pending'   },
+    pending_payment: { label:'💳 পেমেন্ট যাচাই হচ্ছে', cls:'status-pending'   },
+    confirmed:       { label:'✅ নিশ্চিত',              cls:'status-confirmed' },
+    shipped:         { label:'🚚 পাঠানো হয়েছে',        cls:'status-shipped'   },
+    delivered:       { label:'🏠 পৌঁছেছে',             cls:'status-delivered' },
+    cancelled:       { label:'❌ বাতিল',               cls:'status-cancelled' }
+  };
+
+  const payLabels = { bkash:'বিকাশ', nagad:'নগদ', rocket:'রকেট', cod:'ক্যাশ অন ডেলিভারি' };
+
   el.innerHTML = orders.map(o => {
-    const st = statusMap[o.status] || {label:o.status,cls:'status-pending'};
-    const dateStr = new Date(o.createdAt).toLocaleString('bn-BD');
-    const itemsStr = (o.items||[]).map(i => `${i.name} ×${i.qty||1}`).join(', ');
+    const st       = statusMap[o.status] || { label: o.status, cls:'status-pending' };
+    const dateStr  = o.createdAt ? new Date(o.createdAt).toLocaleString('bn-BD') : '';
+    const itemsStr = (o.items||[]).map(i => `${i.name||''} ×${i.qty||1}`).join(', ') || 'পণ্য তথ্য নেই';
     const canCancel = ['pending','pending_payment','confirmed'].includes(o.status);
-    const payMethodLabel = {bkash:'বিকাশ',nagad:'নগদ',rocket:'রকেট',cod:'ক্যাশ অন ডেলিভারি'}[o.paymentMethod]||o.paymentMethod||'';
-    const txInfo = (o.txId && o.txId !== 'COD') ? `<div style="font-size:11px;color:#888;margin-top:4px">💳 ${payMethodLabel} | TXN: <span style="font-weight:700;color:#e53935">${o.txId}</span>${o.txnVerified?'<span style="color:#2e7d32;margin-left:4px">✅ যাচাই হয়েছে</span>':''}</div>` : (o.paymentMethod==='cod'?`<div style="font-size:11px;color:#888;margin-top:4px">💵 ${payMethodLabel}</div>`:'');
-    return `<div class="order-item-card">
-      <div class="order-item-header">
+    const payLabel  = payLabels[o.paymentMethod] || o.paymentMethod || '';
+    const txInfo    = (o.txId && o.txId !== 'COD')
+      ? `<div style="font-size:11px;color:#888;margin-top:4px">
+           💳 ${payLabel} | TNX: <span style="font-weight:700;color:#e53935">${o.txId}</span>
+           ${o.txnVerified ? '<span style="color:#2e7d32;margin-left:6px">✅ যাচাই হয়েছে</span>' : ''}
+         </div>`
+      : (o.paymentMethod==='cod' ? `<div style="font-size:11px;color:#888;margin-top:4px">💵 ${payLabel}</div>` : '');
+
+    // Delivery progress bar
+    const steps = ['pending','confirmed','shipped','delivered'];
+    const stepIdx = steps.indexOf(o.status);
+    const progressPct = stepIdx >= 0 ? Math.round((stepIdx / (steps.length-1)) * 100) : 0;
+    const progressBar = o.status !== 'cancelled'
+      ? `<div style="margin:8px 0 4px">
+           <div style="display:flex;justify-content:space-between;font-size:10px;color:#aaa;margin-bottom:3px">
+             <span>অর্ডার</span><span>নিশ্চিত</span><span>পাঠানো</span><span>পৌঁছেছে</span>
+           </div>
+           <div style="background:#f0f0f0;border-radius:4px;height:6px;overflow:hidden">
+             <div style="background:#e53935;height:100%;width:${progressPct}%;border-radius:4px;transition:width .4s"></div>
+           </div>
+         </div>`
+      : '';
+
+    return `<div class="order-item-card" style="border:1px solid #f0f0f0;border-radius:10px;padding:14px;margin-bottom:12px;background:#fff">
+      <div class="order-item-header" style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
         <div>
           <div style="font-size:13px;font-weight:700;color:#333">${o.orderId}</div>
-          <div class="order-id">${dateStr}</div>
+          <div style="font-size:11px;color:#aaa">${dateStr}</div>
         </div>
-        <span class="order-status ${st.cls}">${st.label}</span>
+        <span class="order-status ${st.cls}" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px">${st.label}</span>
       </div>
-      <div class="order-products">${itemsStr}</div>
+      <div style="font-size:12px;color:#555;margin-bottom:4px;line-height:1.6">${itemsStr}</div>
       ${txInfo}
-      <div class="order-footer">
-        <span class="order-total">৳${(o.grandTotal||o.total||0).toLocaleString()}</span>
+      ${progressBar}
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid #f5f5f5">
+        <span style="font-size:15px;font-weight:800;color:#e53935">৳${(o.grandTotal||o.total||0).toLocaleString()}</span>
         <div style="display:flex;gap:8px">
-          <button onclick="viewOrderReceipt('${o.orderId}')" style="font-size:12px;color:#1565C0;background:none;border:1px solid #1565C0;padding:4px 12px;border-radius:20px;cursor:pointer">রিসিপ্ট</button>
-          ${canCancel ? `<button class="order-cancel-btn" onclick="cancelOrder('${o.orderId}')">বাতিল করুন</button>` : ''}
+          <button onclick="viewOrderReceipt('${o.orderId}')" style="font-size:12px;color:#1565C0;background:none;border:1px solid #1565C0;padding:5px 12px;border-radius:20px;cursor:pointer"><i class="fa fa-file-alt"></i> রিসিপ্ট</button>
+          ${canCancel ? `<button onclick="cancelOrder('${o.orderId}')" style="font-size:12px;color:#c62828;background:none;border:1px solid #c62828;padding:5px 12px;border-radius:20px;cursor:pointer"><i class="fa fa-times"></i> বাতিল</button>` : ''}
         </div>
       </div>
     </div>`;
   }).join('');
 }
+
 function cancelOrder(orderId) {
   if (!confirm('অর্ডার বাতিল করতে চান?')) return;
-  db.ref(`orders/${orderId}/status`).set('cancelled').then(() => {
-    showToast('অর্ডার বাতিল হয়েছে');
+  if (!firebaseOK || !currentUser) return;
+  // দুই path-এ আপডেট করো
+  const updates = {};
+  updates[`orders/${orderId}/status`] = 'cancelled';
+  updates[`userOrders/${currentUser.uid}/${orderId}/status`] = 'cancelled';
+  db.ref().update(updates).then(() => {
+    showToast('✅ অর্ডার বাতিল হয়েছে');
     loadOrderHistory('all');
-  });
+  }).catch(() => showToast('❌ বাতিল করতে সমস্যা হয়েছে'));
 }
+
 function viewOrderReceipt(orderId) {
   const o = allUserOrders.find(x => x.orderId === orderId);
   if (o) generateReceipt(o);
+  else showToast('রিসিপ্ট পাওয়া যায়নি');
 }
 
 // ============================================================
@@ -2322,24 +2633,31 @@ const EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';   // EmailJS Public Key
 // EmailJS init
 try { emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY }); } catch(e) { console.warn('EmailJS init failed:', e); }
 
-// অর্ডার নিশ্চিত হলে ইউজারের ইমেইলে মেসেজ পাঠাও
+// অর্ডার কনফার্ম হলে ইউজারের ইমেইলে মেসেজ পাঠাও
 function sendOrderConfirmEmail(order) {
   if (!currentUser || !currentUser.email) return;
+  if (EMAILJS_SERVICE_ID === 'YOUR_SERVICE_ID') {
+    console.warn('EmailJS keys set করুন: EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, EMAILJS_PUBLIC_KEY');
+    return;
+  }
   const itemsText = (order.items||[]).map(i => `${i.name} ×${i.qty||1} = ৳${(i.price*(i.qty||1)).toLocaleString()}`).join('\n');
   const payLabels = {bkash:'বিকাশ',nagad:'নগদ',rocket:'রকেট',cod:'ক্যাশ অন ডেলিভারি'};
+  const statusLabel = order.txnVerified ? '✅ পেমেন্ট যাচাই হয়েছে — অর্ডার কনফার্ম' : '📦 অর্ডার প্রক্রিয়াধীন';
   const templateParams = {
-    customer_name : currentUser.displayName || order.name,
-    to_email      : currentUser.email,
-    order_id      : order.orderId,
+    customer_name  : currentUser.displayName || order.name,
+    to_email       : currentUser.email,
+    order_id       : order.orderId,
+    order_status   : statusLabel,
     product_details: itemsText,
-    total_amount  : '৳' + (order.grandTotal||order.total||0).toLocaleString(),
-    date          : new Date(order.createdAt).toLocaleString('bn-BD'),
-    payment_method: payLabels[order.paymentMethod] || order.paymentMethod || '',
-    delivery_addr : order.addr,
-    txn_id        : (order.txId && order.txId !== 'COD') ? order.txId : 'ক্যাশ অন ডেলিভারি'
+    total_amount   : '৳' + (order.grandTotal||order.total||0).toLocaleString(),
+    date           : new Date(order.createdAt).toLocaleString('bn-BD'),
+    payment_method : payLabels[order.paymentMethod] || order.paymentMethod || '',
+    delivery_addr  : order.addr,
+    txn_id         : (order.txId && order.txId !== 'COD') ? order.txId : 'ক্যাশ অন ডেলিভারি',
+    delivery_type  : order.deliveryType === 'urgent' ? '⚡ আর্জেন্ট' : '🚚 সাধারণ'
   };
   emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
-    .then(() => console.log('✅ Order email sent'))
+    .then(() => console.log('✅ Order confirmation email sent to', currentUser.email))
     .catch(e => console.warn('EmailJS send failed:', e));
 }
 
@@ -3068,6 +3386,31 @@ function openAccountSettings() {
   if (!currentUser) { showToast('আগে লগইন করুন'); openAuthModal(); return; }
   document.getElementById('userMenu').classList.remove('show');
   document.getElementById('accEmailShow').textContent = currentUser.email || '';
+
+  // Profile tab
+  const pPhoto = document.getElementById('accProfilePhoto');
+  const pName  = document.getElementById('accProfileName');
+  const pEmail = document.getElementById('accProfileEmail');
+  const pNote  = document.getElementById('accLoginMethodNote');
+  if (pPhoto) pPhoto.innerHTML = currentUser.photoURL
+    ? `<img src="${currentUser.photoURL}" style="width:64px;height:64px;border-radius:50%;border:3px solid #e53935">`
+    : `<i class="fa fa-user-circle" style="font-size:64px;color:#e53935"></i>`;
+  if (pName)  pName.textContent  = currentUser.displayName || 'ব্যবহারকারী';
+  if (pEmail) pEmail.textContent = currentUser.email || '';
+
+  // Provider check
+  const providers = (currentUser.providerData || []).map(p => p.providerId);
+  const isEmailUser = providers.includes('password');
+  const providerLabels = { 'google.com':'Google', 'facebook.com':'Facebook', 'github.com':'GitHub', 'password':'ইমেইল/পাসওয়ার্ড' };
+  const provLabel = providers.map(p => providerLabels[p] || p).join(', ');
+  if (pNote) pNote.innerHTML = `<i class="fa fa-shield-alt" style="color:#e53935"></i> লগইন পদ্ধতি: <b>${provLabel}</b>`;
+
+  // Password tab — শুধু email user দেখবে
+  const passNote = document.getElementById('passTabNote');
+  const passForm = document.getElementById('passTabForm');
+  if (passNote) passNote.style.display = isEmailUser ? 'none' : '';
+  if (passForm) passForm.style.display = isEmailUser ? '' : 'none';
+
   switchAccTab('orders', document.querySelector('#accountSettingsOverlay .account-tab'));
   loadAccOrders();
   openModal('accountSettingsOverlay');
@@ -3085,13 +3428,17 @@ function loadAccOrders() {
   const el = document.getElementById('accOrderMini');
   el.innerHTML = '<div style="text-align:center;padding:20px"><div class="gift-spinner" style="margin:0 auto;border-top-color:#e53935"></div></div>';
   if (!firebaseOK || !currentUser) { el.innerHTML = '<p style="font-size:13px;color:#aaa;text-align:center;padding:20px">Firebase সংযোগ নেই</p>'; return; }
-  db.ref('orders').orderByChild('userId').equalTo(currentUser.uid).once('value', snap => {
+
+  db.ref(`userOrders/${currentUser.uid}`).once('value', snap => {
     const orders = [];
-    snap.forEach(c => orders.push(c.val()));
-    orders.sort((a,b) => b.createdAt - a.createdAt);
-    if (!orders.length) { el.innerHTML = '<div style="text-align:center;padding:20px;color:#aaa;font-size:13px"><i class="fa fa-box" style="font-size:30px;display:block;margin-bottom:8px"></i>কোনো অর্ডার নেই</div>'; return; }
-    const statusMap = {pending:'অপেক্ষমান',pending_payment:'💳 পেমেন্ট যাচাই হচ্ছে',confirmed:'নিশ্চিত',shipped:'পাঠানো হয়েছে',delivered:'পৌঁছেছে',cancelled:'বাতিল'};
-    const statusClr = {pending:'#E65100',confirmed:'#2e7d32',shipped:'#1565C0',delivered:'#1b5e20',cancelled:'#c62828'};
+    if (snap.exists()) snap.forEach(c => { const o = c.val(); if (o && o.orderId) orders.push(o); });
+    orders.sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+    if (!orders.length) {
+      el.innerHTML = '<div style="text-align:center;padding:20px;color:#aaa;font-size:13px"><i class="fa fa-box" style="font-size:30px;display:block;margin-bottom:8px"></i>কোনো অর্ডার নেই</div>';
+      return;
+    }
+    const statusMap = { pending:'⏳ অপেক্ষমান', pending_payment:'💳 যাচাই হচ্ছে', confirmed:'✅ নিশ্চিত', shipped:'🚚 পাঠানো', delivered:'🏠 পৌঁছেছে', cancelled:'❌ বাতিল' };
+    const statusClr = { pending:'#E65100', confirmed:'#2e7d32', shipped:'#1565C0', delivered:'#1b5e20', cancelled:'#c62828', pending_payment:'#E65100' };
     el.innerHTML = orders.map(o => `
       <div style="border:1px solid #f0f0f0;border-radius:8px;padding:12px;margin-bottom:10px">
         <div style="display:flex;justify-content:space-between;margin-bottom:4px">
@@ -3118,23 +3465,42 @@ function changePassword() {
 function deleteAccount() {
   if (!confirm('সত্যিই কি অ্যাকাউন্ট ডিলিট করতে চান? এটি পূর্বাবস্থায় ফেরানো যাবে না।')) return;
   if (!firebaseOK || !currentUser) return;
-  const pass = document.getElementById('delPassInput').value;
-  if (!pass) { showToast('পাসওয়ার্ড দিন'); return; }
-  const credential = firebase.auth.EmailAuthProvider.credential(currentUser.email, pass);
-  currentUser.reauthenticateWithCredential(credential).then(() => {
-    const uid = currentUser.uid;
-    // Delete user data then account
+
+  const uid = currentUser.uid;
+  const providerData = currentUser.providerData;
+  const isEmailUser = providerData.some(p => p.providerId === 'password');
+
+  function _doDelete() {
     Promise.all([
       db.ref(`users/${uid}`).remove(),
-      db.ref(`carts/${uid}`).remove(),
-      db.ref(`orders`).orderByChild('userId').equalTo(uid).once('value', snap => { snap.forEach(c => db.ref(`orders/${c.key}`).remove()); })
+      db.ref(`carts/${uid}`).remove()
     ]).then(() => {
       currentUser.delete().then(() => {
         closeModal('accountSettingsOverlay');
         showToast('✅ অ্যাকাউন্ট সফলভাবে ডিলিট হয়েছে।');
-      });
+      }).catch(e => showToast('❌ ' + e.message));
     });
-  }).catch(() => showToast('❌ ভুল পাসওয়ার্ড'));
+  }
+
+  if (isEmailUser) {
+    const pass = prompt('নিশ্চিত করতে আপনার পাসওয়ার্ড দিন:');
+    if (!pass) return;
+    const credential = firebase.auth.EmailAuthProvider.credential(currentUser.email, pass);
+    currentUser.reauthenticateWithCredential(credential)
+      .then(_doDelete)
+      .catch(() => showToast('❌ ভুল পাসওয়ার্ড'));
+  } else {
+    // Social login (Google/Facebook/GitHub)
+    const providerId = providerData[0]?.providerId;
+    let provider;
+    if (providerId === 'google.com') provider = new firebase.auth.GoogleAuthProvider();
+    else if (providerId === 'facebook.com') provider = new firebase.auth.FacebookAuthProvider();
+    else if (providerId === 'github.com') provider = new firebase.auth.GithubAuthProvider();
+    if (provider) {
+      currentUser.reauthenticateWithPopup(provider).then(_doDelete)
+        .catch(() => showToast('❌ পুনরায় লগইন করুন এবং আবার চেষ্টা করুন'));
+    }
+  }
 }
 function openMobileNav() {
   document.getElementById('mobileNav').classList.add('open');
