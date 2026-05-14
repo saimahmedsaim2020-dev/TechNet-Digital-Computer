@@ -793,7 +793,7 @@ footer{background:#212121;color:#ccc;padding:40px 20px 16px;margin-top:30px}
     <div class="section-title"><i class="fa fa-bolt"></i> ফ্ল্যাশ সেল</div>
     <div style="display:flex;align-items:center;gap:12px">
       <div class="countdown">শেষ হতে বাকি: <div class="cd-box" id="cdH">04</div>:<div class="cd-box" id="cdM">32</div>:<div class="cd-box" id="cdS">00</div></div>
-      <a href="#" class="view-all">সব দেখুন →</a>
+      <a href="#" class="view-all" onclick="showAllProducts('flash');return false">সব দেখুন →</a>
     </div>
   </div>
   <div class="products" id="flashGrid">
@@ -813,7 +813,7 @@ footer{background:#212121;color:#ccc;padding:40px 20px 16px;margin-top:30px}
   <!-- NEW ARRIVALS -->
   <div class="section-header">
     <div class="section-title"><i class="fa fa-star"></i> নতুন পণ্য</div>
-    <a href="#" class="view-all">সব দেখুন →</a>
+    <a href="#" class="view-all" onclick="showAllProducts('all');return false">সব দেখুন →</a>
   </div>
   <div class="products" id="newGrid">
     <div class="empty-state"><i class="fa fa-box-open"></i>এডমিন পণ্য যোগ করলে এখানে দেখাবে</div>
@@ -1787,17 +1787,75 @@ function switchToSignup() {
 // ============================================================
 // PRODUCTS RENDER
 // ============================================================
+// ===== PRODUCT RENDER - সব পণ্য দেখাবে =====
+const PRODUCTS_PER_PAGE = 10;
+let flashPage = 1, newPage = 1;
+
 function renderProducts(filtered) {
   const list = filtered || products;
   const flash = list.filter(p => p.flash);
-  const newArr = list.filter(p => p.newArrival && !p.flash);
-  renderGrid('flashGrid', flash.length ? flash : list.filter((_, i) => i < 5));
-  renderGrid('newGrid', newArr.length ? newArr : list.filter((_, i) => i >= 5));
+  const newArr = list.filter(p => !p.flash); // flash ছাড়া সব "নতুন পণ্য"তে
+
+  // Flash sale section
+  const flashToShow = flash.length ? flash : list.slice(0, Math.min(10, list.length));
+  renderGrid('flashGrid', flashToShow, false);
+
+  // New arrivals - সব পণ্য, with load more
+  newPage = 1;
+  renderGridPaged('newGrid', newArr.length ? newArr : list, newPage);
+  updateLoadMoreBtn('newGrid', newArr.length ? newArr : list, newPage);
 }
-function renderGrid(id, items) {
+
+function renderGrid(id, items, append) {
   const grid = document.getElementById(id);
-  if (!items.length) { grid.innerHTML = `<div class="empty-state"><i class="fa fa-box-open"></i>এডমিন পণ্য যোগ করলে এখানে দেখাবে</div>`; return; }
-  grid.innerHTML = items.map(p => productCardHTML(p)).join('');
+  if (!items.length) {
+    grid.innerHTML = '<div class="empty-state"><i class="fa fa-box-open"></i>এডমিন পণ্য যোগ করলে এখানে দেখাবে</div>';
+    return;
+  }
+  const html = items.map(p => productCardHTML(p)).join('');
+  if (append) grid.innerHTML += html;
+  else grid.innerHTML = html;
+}
+
+function renderGridPaged(id, items, page) {
+  const grid = document.getElementById(id);
+  const slice = items.slice(0, page * PRODUCTS_PER_PAGE);
+  if (!slice.length) {
+    grid.innerHTML = '<div class="empty-state"><i class="fa fa-box-open"></i>এডমিন পণ্য যোগ করলে এখানে দেখাবে</div>';
+    return;
+  }
+  grid.innerHTML = slice.map(p => productCardHTML(p)).join('');
+}
+
+function updateLoadMoreBtn(gridId, items, page) {
+  const btnId = gridId + 'LoadMore';
+  let btn = document.getElementById(btnId);
+  const shown = page * PRODUCTS_PER_PAGE;
+  if (items.length > shown) {
+    if (!btn) {
+      btn = document.createElement('div');
+      btn.id = btnId;
+      btn.style = 'grid-column:1/-1;text-align:center;padding:16px 0';
+      document.getElementById(gridId).after(btn);
+    }
+    btn.innerHTML = `<button onclick="loadMoreProducts('${gridId}')" style="background:#e53935;color:#fff;border:none;padding:12px 32px;border-radius:25px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(229,57,53,.3)"><i class="fa fa-chevron-down"></i> আরও পণ্য দেখুন (${items.length - shown} টি বাকি)</button>`;
+    btn.style.display = '';
+  } else if (btn) {
+    btn.style.display = 'none';
+  }
+}
+
+function loadMoreProducts(gridId) {
+  const list = (products || []);
+  const isNew = gridId === 'newGrid';
+  if (isNew) {
+    newPage++;
+    const flash = list.filter(p => p.flash);
+    const newArr = list.filter(p => !p.flash);
+    const items = newArr.length ? newArr : list;
+    renderGridPaged(gridId, items, newPage);
+    updateLoadMoreBtn(gridId, items, newPage);
+  }
 }
 function productCardHTML(p) {
   const disc = p.oldPrice ? Math.round((1 - p.price / p.oldPrice) * 100) : 0;
@@ -2826,6 +2884,49 @@ function doSearch() {
   }, 400);
 }
 function closeSearch() { document.getElementById('searchResults').style.display = 'none'; }
+function showAllProducts(type) {
+  showPage('home');
+  document.getElementById('normalSections').style.display = 'none';
+  const sec = document.getElementById('searchResultSection');
+  sec.style.display = '';
+  const title = document.getElementById('searchResultTitle');
+  const grid = document.getElementById('searchResultGrid');
+
+  let items;
+  if (type === 'flash') {
+    items = products.filter(p => p.flash);
+    title.textContent = `ফ্ল্যাশ সেল (${items.length}টি পণ্য)`;
+    if (!items.length) { items = products; title.textContent = `সব পণ্য (${items.length}টি)`; }
+  } else {
+    items = products;
+    title.textContent = `সব পণ্য (${items.length}টি)`;
+  }
+
+  // Paginated show
+  let page = 1;
+  const PER = 20;
+  function renderPage() {
+    const slice = items.slice(0, page * PER);
+    grid.innerHTML = slice.map(p => productCardHTML(p)).join('');
+    // Load more btn
+    let btn = document.getElementById('allProductsLoadMore');
+    if (items.length > page * PER) {
+      if (!btn) {
+        btn = document.createElement('div');
+        btn.id = 'allProductsLoadMore';
+        btn.style = 'grid-column:1/-1;text-align:center;padding:20px 0';
+        grid.appendChild(btn);
+      }
+      const remaining = items.length - page * PER;
+      btn.innerHTML = `<button onclick="document.getElementById('allProductsLoadMoreBtn').click()" style="background:#e53935;color:#fff;border:none;padding:12px 32px;border-radius:25px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(229,57,53,.3)" id="allProductsLoadMoreBtn"><i class="fa fa-chevron-down"></i> আরও দেখুন (${remaining} টি বাকি)</button>`;
+      document.getElementById('allProductsLoadMoreBtn').onclick = () => { page++; renderPage(); };
+    } else if (btn) {
+      btn.innerHTML = `<p style="color:#aaa;font-size:13px;padding:8px">সব ${items.length}টি পণ্য দেখানো হয়েছে ✓</p>`;
+    }
+  }
+  renderPage();
+}
+
 function filterCat(cat) {
   document.getElementById('giftSectionPage').style.display = 'none';
   showPage('home');
@@ -2837,15 +2938,30 @@ function filterCat(cat) {
     const grid = document.getElementById('searchResultGrid');
     title.textContent = `${cat} খোঁজা হচ্ছে...`;
     grid.innerHTML = `<div class="search-grid-spinner"><div class="search-grid-spinner-inner"></div></div>`;
-    // no forced scroll
     setTimeout(() => {
       const res = products.filter(p => (p.category||'').includes(cat) || p.name.includes(cat));
       title.textContent = `${cat} (${res.length}টি পণ্য)`;
       if (!res.length) {
         grid.innerHTML = `<div class="empty-state"><i class="fa fa-box-open"></i>${cat} ক্যাটাগরিতে কোনো পণ্য নেই</div>`;
-      } else {
-        grid.innerHTML = res.map(p => productCardHTML(p)).join('');
+        return;
       }
+      // Paginated
+      let page = 1;
+      const PER = 20;
+      function renderCatPage() {
+        const slice = res.slice(0, page * PER);
+        grid.innerHTML = slice.map(p => productCardHTML(p)).join('');
+        let btn = document.getElementById('catLoadMore');
+        if (res.length > page * PER) {
+          if (!btn) { btn = document.createElement('div'); btn.id='catLoadMore'; btn.style='grid-column:1/-1;text-align:center;padding:20px 0'; grid.appendChild(btn); }
+          const rem = res.length - page * PER;
+          btn.innerHTML = `<button style="background:#e53935;color:#fff;border:none;padding:12px 32px;border-radius:25px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(229,57,53,.3)"><i class="fa fa-chevron-down"></i> আরও দেখুন (${rem} টি বাকি)</button>`;
+          btn.querySelector('button').onclick = () => { page++; renderCatPage(); };
+        } else if (btn) {
+          btn.innerHTML = `<p style="color:#aaa;font-size:13px;padding:8px">সব ${res.length}টি পণ্য দেখানো হয়েছে ✓</p>`;
+        }
+      }
+      renderCatPage();
     }, 350);
   }, 50);
 }
