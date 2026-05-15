@@ -461,11 +461,12 @@ input:checked+.slider:before{transform:translateX(20px)}
       <button class="nav-item" onclick="showPanel('payments',this)"><i class="fa fa-credit-card"></i> পেমেন্ট যাচাই</button>
       <button class="nav-item" onclick="showPanel('chats',this)"><i class="fa fa-comments"></i> কাস্টমার চ্যাট <span class="nav-badge" id="chatBadge">0</span></button>
 
+      <button class="nav-item" id="couponsNav" onclick="showPanel('coupons',this)"><i class="fa fa-tags"></i> কুপন ও TNX কোড</button>
+
       <div class="nav-section" id="superSection">সুপার অ্যাডমিন</div>
       <button class="nav-item" id="managersNav" onclick="showPanel('managers',this)"><i class="fa fa-user-shield"></i> অ্যাডমিন ম্যানেজার</button>
       <button class="nav-item" id="settingsNav" onclick="showPanel('settings',this)"><i class="fa fa-cog"></i> সাইট সেটিংস</button>
       <button class="nav-item" id="backupNav" onclick="showPanel('backup',this)"><i class="fa fa-database"></i> ব্যাকআপ / রিসেট</button>
-      <button class="nav-item" id="couponsNav" onclick="showPanel('coupons',this)"><i class="fa fa-tags"></i> কুপন কোড</button>
 
       <div class="nav-section">অ্যাকাউন্ট</div>
       <button class="nav-item" onclick="showPanel('profile',this)"><i class="fa fa-user-circle"></i> প্রোফাইল</button>
@@ -856,6 +857,10 @@ input:checked+.slider:before{transform:translateX(20px)}
         <button class="btn btn-primary" onclick="openCouponModal()"><i class="fa fa-plus"></i> নতুন কুপন</button>
       </div>
       <div class="card">
+        <div class="card-header" style="margin-bottom:12px">
+          <div class="card-title"><i class="fa fa-tags"></i> কুপন তালিকা</div>
+          <span id="couponCountBadge" style="font-size:12px;color:var(--muted)"></span>
+        </div>
         <div id="couponsList2"><div class="loading-ring"></div></div>
       </div>
 
@@ -1279,7 +1284,7 @@ function launchAdminApp(){
 }
 
 function hideSuperOnlyNav(){
-  ['managersNav','settingsNav','backupNav','couponsNav','superSection'].forEach(id=>{
+  ['managersNav','settingsNav','backupNav','superSection'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.style.display='none';
   });
@@ -1538,7 +1543,7 @@ function doAdminLogout(){
 // ============================================================
 // PANEL NAV
 // ============================================================
-const panelTitles={dashboard:'ড্যাশবোর্ড',orders:'অর্ডার ব্যবস্থাপনা',products:'পণ্য ব্যবস্থাপনা',gifts:'গিফট আইটেম',users:'ব্যবহারকারীগণ',payments:'পেমেন্ট যাচাই',chats:'কাস্টমার চ্যাট',managers:'অ্যাডমিন ম্যানেজার',settings:'সাইট সেটিংস',backup:'ব্যাকআপ ও রিসেট',coupons:'কুপন কোড',profile:'আমার প্রোফাইল'};
+const panelTitles={dashboard:'ড্যাশবোর্ড',orders:'অর্ডার ব্যবস্থাপনা',products:'পণ্য ব্যবস্থাপনা',gifts:'গিফট আইটেম',users:'ব্যবহারকারীগণ',payments:'পেমেন্ট যাচাই',chats:'কাস্টমার চ্যাট',managers:'অ্যাডমিন ম্যানেজার',settings:'সাইট সেটিংস',backup:'ব্যাকআপ ও রিসেট',coupons:'কুপন ও TNX কোড',profile:'আমার প্রোফাইল'};
 function showPanel(name,btn){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
@@ -1547,6 +1552,12 @@ function showPanel(name,btn){
   if(btn)btn.classList.add('active');
   document.getElementById('topbarTitle').textContent=panelTitles[name]||name;
   if(window.innerWidth<=768)closeSidebar();
+  // panel switch হলে re-render করো
+  if(name==='products'){ if(!allProducts.length) loadProductsAdmin(); else filterProductsLocal(); }
+  if(name==='users') loadUsers();
+  if(name==='orders') loadOrders();
+  if(name==='payments') loadPayments();
+  if(name==='coupons'){ loadCoupons(); loadTnxCodes(); }
 }
 function toggleSidebar(){
   document.getElementById('sidebar').classList.toggle('open');
@@ -1608,12 +1619,25 @@ function renderDashPendingPay(fullSnap){
 // ============================================================
 let allOrders=[];
 let currentOrderStatusFilter='all';
+let _ordersRef = null;
 function loadOrders(){
-  db.ref('orders').on('value',snap=>{
+  if(_ordersRef){
+    // ইতিমধ্যে listener আছে — শুধু re-render করো
+    filterOrdersLocal();
+    return;
+  }
+  _ordersRef = db.ref('orders');
+  _ordersRef.on('value',snap=>{
     allOrders=[];
-    snap.forEach(c=>{const o=c.val();if(o&&o.orderId)allOrders.push({key:c.key,...o});});
+    snap.forEach(c=>{
+      const o=c.val();
+      if(!o)return;
+      // orderId না থাকলে Firebase key দিয়ে set করো — কোনো অর্ডার বাদ পড়বে না
+      if(!o.orderId) o.orderId = c.key;
+      allOrders.push({key:c.key,...o});
+    });
     allOrders.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
-    renderOrdersTable(allOrders);
+    filterOrdersLocal(); // filter সহ render — current filter ধরে রাখবে
     const pending=allOrders.filter(o=>o.status==='pending'||o.status==='pending_payment').length;
     document.getElementById('pendingBadge').textContent=pending;
   });
@@ -1701,7 +1725,8 @@ function updateOrderStatus(){
   db.ref().update(updates).then(()=>{
     showToast('✅ স্ট্যাটাস আপডেট হয়েছে');
     closeModal('orderDetailModal');
-    loadDashboard();
+    // real-time listener নিজেই table আপডেট করবে
+    loadDashboard(); // dashboard stats আপডেট করো
   }).catch(e=>showToast('❌ '+e.message));
 }
 
@@ -1739,15 +1764,18 @@ function loadProductsAdmin(){
   db.ref('products').on('value',snap=>{
     allProducts=[];
     snap.forEach(c=>allProducts.push({id:c.key,...c.val()}));
-    renderProductsTable(allProducts);
+    console.log('[PRODUCTS] Firebase থেকে আসলো:', allProducts.length, 'টি পণ্য');
+    // filter ধরে রেখে re-render করো (delete করলে filter হারাবে না)
+    filterProductsLocal();
   });
 }
 function filterProductsLocal(){
-  const q=(document.getElementById('productSearch').value||'').toLowerCase();
-  const cat=document.getElementById('productCatFilter').value;
+  const q=(document.getElementById('productSearch').value||'').toLowerCase().trim();
+  const cat=(document.getElementById('productCatFilter').value||'').trim();
   let list=allProducts;
-  if(q)list=list.filter(p=>(p.name||'').toLowerCase().includes(q));
-  if(cat)list=list.filter(p=>(p.category||'').includes(cat));
+  if(q) list=list.filter(p=>(p.name||'').toLowerCase().includes(q)||(p.description||'').toLowerCase().includes(q)||(p.category||'').toLowerCase().includes(q));
+  // trim করে compare - Firebase-এ extra space থাকতে পারে
+  if(cat) list=list.filter(p=>(p.category||'').trim()===cat);
   renderProductsTable(list);
 }
 // ===== PRODUCT VIEW STATE =====
@@ -1767,14 +1795,19 @@ function setProductView(v) {
 
 function renderProductsTable(list) {
   currentProductList = list;
-  productDisplayPage = 1;
+  // delete/filter হলে page 1 এ ফিরে যাও, কিন্তু "আরও দেখুন" চাপলে না
+  if(!window._keepProductPage) productDisplayPage = 1;
+  window._keepProductPage = false;
   _renderProductPage();
 }
 
 function loadMoreProductsAdmin() {
   productDisplayPage++;
+  window._keepProductPage = true;
   _renderProductPage();
 }
+
+
 
 function _renderProductPage() {
   const list = currentProductList;
@@ -1900,7 +1933,7 @@ function saveProduct(){
   if(!name){showToast('পণ্যের নাম দিন');return;}
   const data={
     name,
-    category:document.getElementById('pCategory').value,
+    category:(document.getElementById('pCategory').value||'').trim(),
     price:Number(document.getElementById('pPrice').value)||0,
     oldPrice:Number(document.getElementById('pOldPrice').value)||null,
     description:document.getElementById('pDescription').value.trim(),
@@ -1920,8 +1953,13 @@ function saveProduct(){
   }).catch(e=>showToast('❌ '+e.message));
 }
 function deleteProduct(id){
-  if(!confirm('পণ্য ডিলিট করবেন?'))return;
-  db.ref('products/'+id).remove().then(()=>showToast('✅ পণ্য ডিলিট হয়েছে')).catch(e=>showToast('❌ '+e.message));
+  if(!confirm('পণ্য ডিলিট করবেন? এটি পূর্বাবস্থায় ফেরানো যাবে না।'))return;
+  // সাথে সাথে table row বা grid card dim করো
+  const row = document.querySelector(`[onclick*="deleteProduct('${id}')"]`);
+  if(row){const card=row.closest('tr')||row.closest('[style*="border-radius"]');if(card)card.style.opacity='0.3';}
+  db.ref('products/'+id).remove()
+    .then(()=>showToast('✅ পণ্য ডিলিট হয়েছে'))
+    .catch(e=>{showToast('❌ '+e.message);filterProductsLocal();});
 }
 
 // ============================================================
@@ -1987,11 +2025,19 @@ function deleteGift(id){
 // USERS
 // ============================================================
 let allUsers=[];
+let _usersRef = null;
 function loadUsers(){
-  db.ref('users').on('value',snap=>{
+  if(_usersRef) {
+    // ইতিমধ্যে listener আছে — শুধু re-render করো
+    filterUsersLocal();
+    return;
+  }
+  _usersRef = db.ref('users');
+  _usersRef.on('value',snap=>{
     allUsers=[];
     snap.forEach(c=>allUsers.push({uid:c.key,...c.val()}));
-    renderUsersTable(allUsers);
+    console.log('[USERS] Firebase থেকে আসলো:', allUsers.length, 'জন');
+    filterUsersLocal(); // filter সহ render করো — সব user দেখাবে
   });
 }
 function filterUsersLocal(){
@@ -2628,28 +2674,42 @@ function switchSettingsTab(tab,btn){
 // ============================================================
 // TNX CODE MANAGER
 // ============================================================
+let _tnxRef = null;
+let _allTnxCodes = []; // TNX codes cache
 function loadTnxCodes(){
   const el=document.getElementById('tnxCodesList');
   if(!el)return;
-  db.ref('tnxCodes').on('value',snap=>{
-    const codes=[];
-    snap.forEach(c=>codes.push({key:c.key,...c.val()}));
-    if(!codes.length){
-      el.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px"><i class="fa fa-key" style="font-size:28px;display:block;margin-bottom:8px;opacity:.4"></i>কোনো TNX কোড নেই</div>';
-      return;
-    }
-    el.innerHTML=codes.map(c=>`
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border:1.5px solid ${c.used?'#f0f0f0':'#c8e6c9'};border-radius:8px;margin-bottom:8px;background:${c.used?'#fafafa':'#f1f8e9'}">
-        <div>
-          <div style="font-size:15px;font-weight:900;letter-spacing:2px;color:${c.used?'#aaa':'var(--green)'};">${c.key}</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px">${c.used?'<span style="color:#c62828"><i class="fa fa-times-circle"></i> ব্যবহার হয়েছে</span>':'<span style="color:var(--green)"><i class="fa fa-check-circle"></i> ব্যবহারযোগ্য</span>'} &nbsp;|&nbsp; তৈরি: ${new Date(c.createdAt||Date.now()).toLocaleString('bn-BD')}</div>
-        </div>
-        <div style="display:flex;gap:6px">
-          <button onclick="copyTnx('${c.key}')" class="btn btn-outline btn-sm" title="কপি করুন"><i class="fa fa-copy"></i></button>
-          <button onclick="deleteTnxCode('${c.key}')" class="btn btn-danger btn-sm" title="ডিলিট"><i class="fa fa-trash"></i></button>
-        </div>
-      </div>`).join('');
+  if(_tnxRef) {
+    // ইতিমধ্যে listener আছে — cache থেকে re-render করো
+    _renderTnxCodes(_allTnxCodes);
+    return;
+  }
+  _tnxRef = db.ref('tnxCodes');
+  _tnxRef.on('value',snap=>{
+    _allTnxCodes=[];
+    snap.forEach(c=>_allTnxCodes.push({key:c.key,...c.val()}));
+    console.log('[TNX] Firebase থেকে আসলো:', _allTnxCodes.length, 'টি কোড', _allTnxCodes);
+    _renderTnxCodes(_allTnxCodes);
   });
+}
+function _renderTnxCodes(codes){
+  const el=document.getElementById('tnxCodesList');
+  if(!el)return;
+  if(!codes.length){
+    el.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px"><i class="fa fa-key" style="font-size:28px;display:block;margin-bottom:8px;opacity:.4"></i>কোনো TNX কোড নেই</div>';
+    return;
+  }
+  el.innerHTML=codes.map(c=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border:1.5px solid ${c.used?'#f0f0f0':'#c8e6c9'};border-radius:8px;margin-bottom:8px;background:${c.used?'#fafafa':'#f1f8e9'}">
+      <div>
+        <div style="font-size:15px;font-weight:900;letter-spacing:2px;color:${c.used?'#aaa':'var(--green)'};">${c.key}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">${c.used?'<span style="color:#c62828"><i class="fa fa-times-circle"></i> ব্যবহার হয়েছে</span>':'<span style="color:var(--green)"><i class="fa fa-check-circle"></i> ব্যবহারযোগ্য</span>'} &nbsp;|&nbsp; তৈরি: ${new Date(c.createdAt||Date.now()).toLocaleString('bn-BD')}</div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button onclick="copyTnx('${c.key}')" class="btn btn-outline btn-sm" title="কপি করুন"><i class="fa fa-copy"></i></button>
+        <button onclick="deleteTnxCode('${c.key}')" class="btn btn-danger btn-sm" title="ডিলিট"><i class="fa fa-trash"></i></button>
+      </div>
+    </div>`).join('');
 }
 function addManualTnxCode(){
   const code=document.getElementById('manualTnxInput').value.trim().toUpperCase();
@@ -2677,26 +2737,43 @@ function copyTnx(code){
 }
 
 let allCoupons=[];
+let _couponsRef = null;
 function loadCoupons(){
-  db.ref('coupons').on('value',snap=>{
-    allCoupons=[];
-    snap.forEach(c=>allCoupons.push({id:c.key,...c.val()}));
+  if(_couponsRef) {
+    renderCoupons(); // allCoupons এ ইতিমধ্যে data আছে — সরাসরি render করো
+    return;
+  }
+  _couponsRef = db.ref('coupons');
+  _couponsRef.on('value', snap => {
+    allCoupons = [];
+    snap.forEach(c => allCoupons.push({id: c.key, ...c.val()}));
+    console.log('[COUPON] Firebase থেকে আসলো:', allCoupons.length, 'টি কুপন', allCoupons);
     renderCoupons();
   });
 }
 function renderCoupons(){
-  const html=allCoupons.length?allCoupons.map(c=>`
-    <div class="coupon-item">
-      <div>
-        <div class="coupon-code">${c.code}</div>
-        <div style="font-size:12px;color:var(--muted)">${c.type==='percent'?c.value+'% ছাড়':'৳'+c.value+' ছাড়'} | ন্যূনতম ৳${c.minOrder||0}</div>
+  const html = allCoupons.length ? allCoupons.map(c => {
+    const typeLabel = c.type==='percent' ? `${c.value}% ছাড়` : `৳${c.value} ছাড়`;
+    const expLabel = c.expiry ? ` | মেয়াদ: ${c.expiry}` : '';
+    const limitLabel = c.limit ? ` | সীমা: ${c.limit}টি` : '';
+    const usedLabel = c.used ? ` | ব্যবহার: ${c.used}টি` : '';
+    return `<div class="coupon-item" style="flex-wrap:wrap;gap:8px">
+      <div style="flex:1;min-width:0">
+        <div class="coupon-code">${c.code || c.id}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:3px">${typeLabel} | ন্যূনতম ৳${c.minOrder||0}${limitLabel}${usedLabel}${expLabel}</div>
       </div>
-      <div class="btn-group">
-        <button class="btn btn-danger btn-sm" onclick="deleteCoupon('${c.id}')"><i class="fa fa-trash"></i></button>
+      <div class="btn-group" style="flex-shrink:0">
+        <button class="btn btn-danger btn-sm" onclick="deleteCoupon('${c.id}')"><i class="fa fa-trash"></i> ডিলিট</button>
       </div>
-    </div>`).join(''):
-    '<div class="empty-state"><i class="fa fa-tags"></i><p>কোনো কুপন নেই</p></div>';
-  ['couponsList','couponsList2'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=html;});
+    </div>`;
+  }).join('') : '<div class="empty-state"><i class="fa fa-tags"></i><p>কোনো কুপন নেই। উপরে "+ নতুন কুপন" চাপুন।</p></div>';
+  // count badge
+  const cb = document.getElementById('couponCountBadge');
+  if(cb) cb.textContent = allCoupons.length ? `মোট ${allCoupons.length}টি কুপন` : '';
+  ['couponsList','couponsList2'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.innerHTML = html;
+  });
 }
 function openCouponModal(){openModal('couponModal');document.getElementById('couponCode').value='';document.getElementById('couponValue').value='';}
 function saveCoupon(){
@@ -2830,10 +2907,7 @@ function getBnError(code){
 // ============================================================
 // INIT LOADS (after auth)
 // ============================================================
-// Products are loaded when products panel is shown
-document.querySelector('[onclick="showPanel(\'products\',this)"]').addEventListener('click',()=>{
-  if(!allProducts.length)loadProductsAdmin();
-});
+// Products, users, coupons are loaded when their panel is shown (via showPanel)
 
 // Splash timeout
 setTimeout(()=>{if(document.getElementById('splash').style.display!=='none'&&!currentAdminUser)showLoginPage();},3000);
