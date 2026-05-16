@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎁 কাস্টম গিফট কালেকশন - techNet</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-firestore-compat.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{overflow-x:hidden;max-width:100vw}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f5f5f5;color:#222}
+
+/* ===== GIFT SECTION ===== */
+#giftSection{background:linear-gradient(180deg,#f3e5f5 0%,#fce4ec 100%);min-height:100vh;padding:24px 16px}
+.gift-section-inner{max-width:1200px;margin:0 auto}
+.section-title{font-size:20px;font-weight:900;color:#7b1fa2;display:flex;align-items:center;gap:8px}
+.section-title i{font-size:22px}
+
+/* Gift tabs */
+.gift-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.gift-tab{background:#fff;border:2px solid #ce93d8;padding:10px 18px;border-radius:25px;font-size:14px;font-weight:700;color:#7b1fa2;cursor:pointer;transition:all .2s;white-space:nowrap}
+.gift-tab:hover{background:#f3e5f5}
+.gift-tab.active{background:#7b1fa2;color:#fff;border-color:#7b1fa2}
+
+/* Gift grid */
+.gift-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.gift-card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(123,31,162,.12);cursor:pointer;transition:all .25s}
+.gift-card:hover{transform:translateY(-4px);box-shadow:0 6px 20px rgba(123,31,162,.25)}
+.gift-img-wrap{position:relative;width:100%;padding-top:78%;overflow:hidden}
+.gift-img-wrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .35s}
+.gift-card:hover .gift-img-wrap img{transform:scale(1.08)}
+.gift-emoji-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.gift-cat-badge{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.7);color:#fff;font-size:11px;padding:4px 10px;border-radius:20px;font-weight:700}
+.gift-info{padding:12px}
+.gift-info h4{font-size:13px;font-weight:700;color:#333;margin-bottom:6px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.4;height:36px}
+.gift-price{font-size:16px;font-weight:900;margin-bottom:10px}
+.btn-gift-order{width:100%;background:linear-gradient(135deg,#7b1fa2,#9c27b0);color:#fff;border:none;padding:9px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-gift-order:hover{background:linear-gradient(135deg,#6a1b9a,#8e24aa)}
+
+/* Loading */
+.gift-loading{grid-column:1/-1;display:flex;align-items:center;justify-content:center;padding:60px 20px}
+.gift-spinner{width:44px;height:44px;border:4px solid #f0f0f0;border-top-color:#7b1fa2;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Empty state */
+.gift-empty{grid-column:1/-1;text-align:center;padding:60px 20px;color:#999}
+.gift-empty i{font-size:48px;color:#ce93d8;display:block;margin-bottom:16px}
+
+/* ===== GIFT DETAIL PAGE ===== */
+#giftDetailPage{display:none;background:#f5f5f5;min-height:100vh;flex-direction:column;overflow-x:hidden}
+.product-page-nav{background:#7b1fa2;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.product-page-nav button{background:rgba(255,255,255,.15);border:none;color:#fff;padding:8px 16px;border-radius:6px;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:8px;font-weight:600}
+.product-page-nav button:hover{background:rgba(255,255,255,.25)}
+.breadcrumb{color:#fff;font-size:15px;font-weight:700}
+
+#giftDetailWrap{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start;max-width:1100px;margin:28px auto;padding:0 20px;box-sizing:border-box;width:100%}
+#giftImgCol{position:sticky;top:80px}
+#giftDetailImgWrap{width:100%;height:420px;border-radius:14px;overflow:hidden;background:#f3e5f5;display:flex;align-items:center;justify-content:center;font-size:80px;box-sizing:border-box}
+#giftDetailImgWrap img{width:100%;height:100%;object-fit:contain;display:block}
+#giftDetailInfo{padding-bottom:24px}
+
+/* Detail info classes */
+.gd-title{font-size:22px;font-weight:900;margin-bottom:10px;line-height:1.4;color:#222}
+.gd-price-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.gd-price{font-size:28px;font-weight:900}
+.gd-badge{font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;color:#fff;white-space:nowrap}
+.gd-custom-box{border-radius:8px;padding:14px;margin-bottom:14px;font-size:13px;color:#555;line-height:1.9;background:#f3e5f5}
+.gd-custom-title{font-weight:700;color:#7b1fa2;margin-bottom:6px;display:block}
+.gd-delivery-box{background:#e8f5e9;border-radius:8px;padding:11px 14px;font-size:13px;color:#2e7d32;margin-bottom:14px}
+.gd-btn-row{display:flex;gap:10px;margin-bottom:12px}
+.gd-btn-cart{flex:1;background:linear-gradient(135deg,#7b1fa2,#9c27b0);color:#fff;border:none;padding:13px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 12px rgba(123,31,162,.3)}
+.gd-btn-wa{background:#25D366;color:#fff;border:none;padding:13px 16px;border-radius:8px;font-size:20px;cursor:pointer;box-shadow:0 4px 12px rgba(37,211,102,.3);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.gd-share-box{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:10px 12px;font-size:12px;color:#666;display:flex;align-items:center;gap:8px;margin-bottom:0;overflow:hidden}
+.gd-share-link{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;font-size:11px;color:#999}
+.gd-share-btn{background:#7b1fa2;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0}
+
+/* Contact box */
+.gd-contact{margin-top:16px;background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:12px;padding:18px 20px;color:#fff}
+.gd-contact-title{font-size:14px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.gd-contact-bar{background:#7b1fa2;width:3px;height:18px;border-radius:2px;display:inline-block;flex-shrink:0}
+.gd-contact-list{display:flex;flex-direction:column;gap:10px}
+.gd-contact-item{display:flex;align-items:center;gap:10px;color:#d1c4e9;text-decoration:none;font-size:13px;word-break:break-word}
+.gd-contact-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#7b1fa2;font-size:13px}
+.gd-contact-icon.wa{background:#25D366}
+.gd-contact-footer{margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.12);font-size:11px;color:#aaa;text-align:center}
+
+/* Related gifts */
+#giftRelatedWrap{max-width:1100px;margin:8px auto 48px;padding:0 20px;box-sizing:border-box}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.3);animation:slideUp .3s}
+@keyframes slideUp{from{bottom:0;opacity:0}to{bottom:24px;opacity:1}}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:900px){
+  .gift-grid{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:860px){
+  #giftDetailWrap{grid-template-columns:1fr;gap:0;margin:0;padding:0;width:100%}
+  #giftImgCol{position:static}
+  #giftDetailImgWrap{width:100%;height:300px;border-radius:0}
+  #giftDetailInfo{padding:16px 14px 20px}
+  #giftRelatedWrap{padding:0 14px;margin-bottom:32px}
+}
+@media(max-width:640px){
+  .gift-grid{grid-template-columns:repeat(2,1fr)}
+  .gift-img-wrap{padding-top:65%}
+  .gift-card{border-radius:8px}
+  .gift-info{padding:8px}
+  .gift-info h4{font-size:11px;height:28px}
+  .gift-price{font-size:13px !important;margin-bottom:5px !important}
+  .btn-gift-order{padding:7px;font-size:11px}
+}
+@media(max-width:540px){
+  #giftDetailImgWrap{height:240px}
+  .gd-title{font-size:17px;margin-bottom:8px}
+  .gd-price{font-size:21px}
+  .gd-badge{font-size:10px;padding:3px 8px}
+  .gd-custom-box{font-size:12px;padding:10px;line-height:1.7}
+  .gd-delivery-box{font-size:12px;padding:9px 12px}
+  .gd-btn-cart{font-size:13px;padding:11px}
+  .gd-btn-wa{padding:11px 13px;font-size:18px}
+  .gd-contact{padding:14px}
+  .gd-contact-item{font-size:12px;gap:8px}
+  .gd-contact-icon{width:28px;height:28px;font-size:11px}
+  #giftDetailInfo{padding:12px 12px 16px}
+  #giftRelatedWrap{padding:0 10px;margin-bottom:24px}
+}
+@media(max-width:400px){
+  .gift-img-wrap{padding-top:55%}
+  .gift-grid{gap:8px}
+}
+@media(max-width:380px){
+  #giftDetailImgWrap{height:200px}
+  .gd-title{font-size:15px}
+  .gd-price{font-size:18px}
+  .gd-btn-cart{font-size:12px;padding:10px}
+  .gd-contact-icon{width:26px;height:26px}
+  #giftDetailInfo{padding:10px 10px 14px}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== GIFT SECTION ===== -->
+<div id="giftSection">
+  <div class="gift-section-inner">
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="section-title"><i class="fa fa-gift"></i> কাস্টম গিফট কালেকশন</div>
+        <span style="background:#7b1fa2;color:#fff;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:700">নতুন</span>
+      </div>
+    </div>
+
+    <!-- Info strip -->
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px">
+      <div style="background:#fff;border-radius:8px;padding:8px 14px;font-size:12px;color:#555;display:flex;align-items:center;gap:6px;box-shadow:0 1px 4px rgba(123,31,162,.1)"><i class="fa fa-paint-brush" style="color:#7b1fa2"></i> ১০০% কাস্টমাইজড</div>
+      <div style="background:#fff;border-radius:8px;padding:8px 14px;font-size:12px;color:#555;display:flex;align-items:center;gap:6px;box-shadow:0 1px 4px rgba(123,31,162,.1)"><i class="fa fa-truck" style="color:#7b1fa2"></i> হোম ডেলিভারি</div>
+      <div style="background:#fff;border-radius:8px;padding:8px 14px;font-size:12px;color:#555;display:flex;align-items:center;gap:6px;box-shadow:0 1px 4px rgba(123,31,162,.1)"><i class="fab fa-whatsapp" style="color:#25D366"></i> WhatsApp অর্ডার</div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="gift-tabs">
+      <button class="gift-tab active" onclick="filterGifts('all',this)">🎁 সব গিফট</button>
+      <button class="gift-tab" onclick="filterGifts('mug',this)">☕ কাস্টম মগ</button>
+      <button class="gift-tab" onclick="filterGifts('crest',this)">🏆 ক্রেস্ট / ট্রফি</button>
+      <button class="gift-tab" onclick="filterGifts('frame',this)">🖼 ফটো ফ্রেম</button>
+    </div>
+
+    <!-- Grid -->
+    <div class="gift-grid" id="giftGrid">
+      <div class="gift-loading"><div class="gift-spinner"></div></div>
+    </div>
+    <div class="gift-empty" id="giftEmpty" style="display:none">
+      <i class="fa fa-gift"></i>
+      <p>এই ক্যাটাগরিতে কোনো পণ্য নেই</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== GIFT DETAIL PAGE ===== -->
+<div id="giftDetailPage">
+  <div class="product-page-nav">
+    <button onclick="closeGiftDetail()"><i class="fa fa-arrow-left"></i> গিফট কালেকশন</button>
+    <span class="breadcrumb" id="giftDetailBreadcrumb">গিফট বিস্তারিত</span>
+  </div>
+
+  <div id="giftDetailWrap">
+    <div id="giftImgCol">
+      <div id="giftDetailImgWrap"></div>
+    </div>
+    <div id="giftDetailInfo"></div>
+  </div>
+
+  <div id="giftRelatedWrap">
+    <div class="section-title" style="margin-bottom:14px"><i class="fa fa-gift"></i> একই ধরনের গিফট</div>
+    <div class="gift-grid" id="giftRelatedGrid"></div>
+  </div>
+</div>
+
+<script>
+// ===== FIREBASE CONFIG =====
+const _k1 = [65,73,122,97,83,121,67,102].map(c=>String.fromCharCode(c)).join('');
+const _k2 = [114,48,102,74,95,88,78,67].map(c=>String.fromCharCode(c)).join('');
+const _k3 = [100,83,109,52,76,113,56,102].map(c=>String.fromCharCode(c)).join('');
+const _k4 = [70,117,81,108,74,101,117,116].map(c=>String.fromCharCode(c)).join('');
+const _k5 = [101,56,68,119,50,74,119].map(c=>String.fromCharCode(c)).join('');
+const _d1 = ['technet','-','digital','-','computer'].join('');
+const _d2 = ['technet','-','digital','-','computer','-default-rtdb'].join('');
+const _d3 = ['676742579629'].join('');
+const _d4 = ['1:',_d3,':web:1810a54ca33c249a4a8d24'].join('');
+
+const firebaseConfig = {
+  apiKey: _k1+_k2+_k3+_k4+_k5,
+  authDomain: _d1+'.firebaseapp.com',
+  databaseURL: 'https://'+_d2+'.firebaseio.com',
+  projectId: _d1,
+  storageBucket: _d1+'.firebasestorage.app',
+  messagingSenderId: _d3,
+  appId: _d4
+};
+
+let firebaseOK = false;
+let firestore = null;
+let siteSettings = {};
+
+try {
+  firebase.initializeApp(firebaseConfig);
+  firestore = firebase.firestore();
+  firebaseOK = true;
+  console.log('✅ Firebase connected');
+  
+  // Load site settings for contact info
+  firebase.database().ref('settings').on('value', snap => {
+    if (snap.exists()) siteSettings = snap.val();
+  });
+} catch(e) {
+  console.error('❌ Firebase init failed:', e.message);
+}
+
+// ===== STATE =====
+let currentGiftItems = [];
+let currentGiftFilter = 'all';
+
+// ===== LOAD GIFTS =====
+async function loadGiftImages(category) {
+  const grid = document.getElementById('giftGrid');
+  const empty = document.getElementById('giftEmpty');
+  grid.innerHTML = '<div class="gift-loading"><div class="gift-spinner"></div></div>';
+  empty.style.display = 'none';
+
+  if (!firebaseOK) {
+    renderGiftItems([]);
+    return;
+  }
+
+  try {
+    const snap = await firestore.collection('gifts').get();
+    let items = [];
+    snap.forEach(doc => {
+      const d = doc.data();
+      if (category === 'all' || d.category === category) {
+        items.push({ id: doc.id, ...d });
+      }
+    });
+    renderGiftItems(items);
+  } catch(e) {
+    console.warn('Firestore load failed:', e.message);
+    renderGiftItems([]);
+  }
+}
+
+function renderGiftItems(items) {
+  const grid = document.getElementById('giftGrid');
+  const empty = document.getElementById('giftEmpty');
+  grid.innerHTML = '';
+  
+  if (!items.length) {
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  currentGiftItems = items;
+
+  const catLabels = { mug:'☕ মগ', crest:'🏆 ক্রেস্ট', frame:'🖼 ফ্রেম' };
+  const catEmojis = { mug:'☕', crest:'🏆', frame:'🖼️' };
+  const catBg = {
+    mug:   'linear-gradient(145deg,#fff8e1,#ffe0b2)',
+    crest: 'linear-gradient(145deg,#fffde7,#fff9c4)',
+    frame: 'linear-gradient(145deg,#f3e5f5,#e1bee7)'
+  };
+  const catAccent = { mug:'#E65100', crest:'#F9A825', frame:'#7b1fa2' };
+
+  items.forEach(item => {
+    const bg = catBg[item.category] || 'linear-gradient(145deg,#f9f0ff,#ede0f8)';
+    const emoji = catEmojis[item.category] || '🎁';
+    const accent = catAccent[item.category] || '#7b1fa2';
+
+    const imgHTML = item.imageUrl
+      ? `<img src="${item.imageUrl}" alt="${item.name}" loading="lazy"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+         <div class="gift-emoji-ph" style="display:none;background:${bg}">
+           <span style="font-size:56px;line-height:1">${emoji}</span>
+         </div>`
+      : `<div class="gift-emoji-ph" style="background:${bg}">
+           <span style="font-size:56px;line-height:1">${emoji}</span>
+         </div>`;
+
+    const card = document.createElement('div');
+    card.className = 'gift-card';
+    card.onclick = () => openGiftDetail(item.id);
+    card.innerHTML = `
+      <div class="gift-img-wrap" style="background:${bg}">
+        ${imgHTML}
+        <span class="gift-cat-badge">${catLabels[item.category]||item.category}</span>
+      </div>
+      <div class="gift-info">
+        <h4>${item.name}</h4>
+        <div class="gift-price" style="color:${accent}">৳${item.price||'যোগাযোগ করুন'}</div>
+        <button class="btn-gift-order" onclick="event.stopPropagation();openWhatsApp('${item.name.replace(/'/g,"\\'")}',${item.price||0})">
+          <i class="fab fa-whatsapp"></i> অর্ডার করুন
+        </button>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+function filterGifts(cat, btn) {
+  document.querySelectorAll('.gift-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  currentGiftFilter = cat;
+  loadGiftImages(cat);
+}
+
+// ===== GIFT DETAIL =====
+function openGiftDetail(itemId) {
+  const item = currentGiftItems.find(x => x.id === itemId);
+  if (!item) return;
+  
+  history.pushState({page:'gift', id:itemId}, '', `#gift/${itemId}`);
+
+  const catLabels  = { mug:'☕ মগ', crest:'🏆 ক্রেস্ট', frame:'🖼 ফ্রেম' };
+  const catEmojis  = { mug:'☕', crest:'🏆', frame:'🖼️' };
+  const catBg      = { mug:'linear-gradient(145deg,#fff8e1,#ffe0b2)', crest:'linear-gradient(145deg,#fffde7,#fff9c4)', frame:'linear-gradient(145deg,#f3e5f5,#e1bee7)' };
+  const catAccent  = { mug:'#E65100', crest:'#F9A825', frame:'#7b1fa2' };
+
+  const emoji  = catEmojis[item.category]  || '🎁';
+  const bg     = catBg[item.category]      || 'linear-gradient(145deg,#f9f0ff,#ede0f8)';
+  const accent = catAccent[item.category]  || '#7b1fa2';
+  const label  = catLabels[item.category]  || 'গিফট';
+
+  document.getElementById('giftDetailBreadcrumb').textContent = item.name;
+
+  const imgWrap = document.getElementById('giftDetailImgWrap');
+  imgWrap.style.background = bg;
+  if (item.imageUrl) {
+    imgWrap.innerHTML = `<img src="${item.imageUrl}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;flex-direction:column;gap:8px;background:${bg}">
+        <span style="font-size:90px">${emoji}</span>
+        <span style="font-size:13px;color:#888;font-weight:600">${label}</span>
+      </div>`;
+  } else {
+    imgWrap.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;width:100%;height:100%">
+      <span style="font-size:90px">${emoji}</span>
+      <span style="font-size:14px;color:#888;font-weight:600">${label}</span>
+    </div>`;
+  }
+
+  const phone = (siteSettings && siteSettings.whatsapp) || '+8801604674896';
+  
+  document.getElementById('giftDetailInfo').innerHTML = `
+    <h1 class="gd-title">${item.name}</h1>
+    <div class="gd-price-row">
+      <span class="gd-price" style="color:${accent}">৳${item.price||'যোগাযোগ করুন'}</span>
+      <span class="gd-badge" style="background:${accent}">${label}</span>
+    </div>
+    <div class="gd-custom-box">
+      <div class="gd-custom-title"><i class="fa fa-paint-brush"></i> কাস্টমাইজেশন সুবিধা</div>
+      <div>✅ আপনার ছবি / নাম / বার্তা প্রিন্ট করা যাবে</div>
+      <div>✅ গিফট র‍্যাপিং ফ্রি</div>
+      <div>✅ হোম ডেলিভারি সারা বাংলাদেশ</div>
+      <div>✅ অর্ডারের ২-৫ কার্যদিবসে ডেলিভারি</div>
+    </div>
+    <div class="gd-delivery-box">
+      <i class="fa fa-truck"></i> ডেলিভারি চার্জ: সারা বাংলাদেশ পাঠানো হয়
+    </div>
+    <div class="gd-btn-row">
+      <button class="gd-btn-cart" onclick="openWhatsApp('${item.name.replace(/'/g,"\\'")}',${item.price||0})">
+        <i class="fab fa-whatsapp"></i> WhatsApp এ অর্ডার করুন
+      </button>
+    </div>
+    <div class="gd-share-box">
+      <span class="gd-share-link">🔗 ${location.origin}${location.pathname}#gift/${item.id}</span>
+      <button class="gd-share-btn" onclick="copyLink('${location.origin}${location.pathname}#gift/${item.id}')">কপি</button>
+    </div>
+    <div class="gd-contact">
+      <div class="gd-contact-title">
+        <span class="gd-contact-bar"></span> যোগাযোগ করুন
+      </div>
+      <div class="gd-contact-list">
+        <a class="gd-contact-item" href="https://maps.google.com/?q=${encodeURIComponent((siteSettings&&siteSettings.footerAddress)||'Golapganj, Sylhet')}" target="_blank">
+          <span class="gd-contact-icon"><i class="fa fa-map-marker-alt"></i></span>
+          <span>${(siteSettings&&siteSettings.footerAddress)||'Golapganj, Sylhet'}</span>
+        </a>
+        <a class="gd-contact-item" href="tel:${(siteSettings&&siteSettings.footerPhone)||phone}">
+          <span class="gd-contact-icon"><i class="fa fa-phone"></i></span>
+          <span>${(siteSettings&&siteSettings.footerPhone)||phone}</span>
+        </a>
+        <a class="gd-contact-item" href="mailto:${(siteSettings&&siteSettings.footerEmail)||'saimahmedsaim2025@gmail.com'}">
+          <span class="gd-contact-icon"><i class="fa fa-envelope"></i></span>
+          <span style="word-break:break-all">${(siteSettings&&siteSettings.footerEmail)||'saimahmedsaim2025@gmail.com'}</span>
+        </a>
+        <a class="gd-contact-item" href="https://wa.me/${phone}?text=${encodeURIComponent('আমি এই গিফটটি অর্ডার করতে চাই: '+item.name)}" target="_blank">
+          <span class="gd-contact-icon wa"><i class="fab fa-whatsapp"></i></span>
+          <span>WhatsApp-এ অর্ডার করুন</span>
+        </a>
+      </div>
+      <div class="gd-contact-footer">⏰ অফিস সময়: সকাল ৯টা – রাত ৯টা &nbsp;|&nbsp; সারা বাংলাদেশ ডেলিভারি</div>
+    </div>`;
+
+  // Related gifts
+  const related = currentGiftItems.filter(x => x.id !== itemId && x.category === item.category).slice(0,6);
+  const relGrid = document.getElementById('giftRelatedGrid');
+  document.getElementById('giftRelatedWrap').style.display = related.length ? '' : 'none';
+  
+  if (related.length) {
+    relGrid.innerHTML = '';
+    related.forEach(r => {
+      const rb = catBg[r.category]||bg;
+      const re = catEmojis[r.category]||'🎁';
+      const ra = catAccent[r.category]||'#7b1fa2';
+      const card = document.createElement('div');
+      card.className = 'gift-card';
+      card.onclick = () => openGiftDetail(r.id);
+      card.innerHTML = `
+        <div class="gift-img-wrap" style="background:${rb}">
+          ${r.imageUrl
+            ? `<img src="${r.imageUrl}" alt="${r.name}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+               <div class="gift-emoji-ph" style="display:none;background:${rb}"><span style="font-size:48px">${re}</span></div>`
+            : `<div class="gift-emoji-ph" style="background:${rb}"><span style="font-size:48px">${re}</span></div>`
+          }
+          <span class="gift-cat-badge">${catLabels[r.category]||r.category}</span>
+        </div>
+        <div class="gift-info">
+          <h4>${r.name}</h4>
+          <div class="gift-price" style="color:${ra}">৳${r.price||'যোগাযোগ করুন'}</div>
+          <button class="btn-gift-order" onclick="event.stopPropagation();openWhatsApp('${r.name.replace(/'/g,"\\'")}',${r.price||0})">
+            <i class="fab fa-whatsapp"></i> অর্ডার
+          </button>
+        </div>`;
+      relGrid.appendChild(card);
+    });
+  }
+
+  document.getElementById('giftSection').style.display = 'none';
+  document.getElementById('giftDetailPage').style.cssText = 'display:flex;flex-direction:column;min-height:100vh;background:#f5f5f5;overflow-x:hidden';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function closeGiftDetail() {
+  history.pushState({page:'home'}, '', location.pathname);
+  document.getElementById('giftDetailPage').style.display = 'none';
+  document.getElementById('giftSection').style.display = '';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// ===== URL HANDLING =====
+window.addEventListener('popstate', e => {
+  if (location.hash.startsWith('#gift/')) {
+    const id = location.hash.replace('#gift/', '');
+    _openGiftFromURL(id);
+  } else {
+    closeGiftDetail();
+  }
+});
+
+function _openGiftFromURL(id) {
+  if (currentGiftItems && currentGiftItems.length) {
+    openGiftDetail(id);
+  } else {
+    const interval = setInterval(() => {
+      if (currentGiftItems && currentGiftItems.length) {
+        clearInterval(interval);
+        openGiftDetail(id);
+      }
+    }, 200);
+    setTimeout(() => clearInterval(interval), 5000);
+  }
+}
+
+// Check initial URL
+if (location.hash.startsWith('#gift/')) {
+  const id = location.hash.replace('#gift/', '');
+  _openGiftFromURL(id);
+}
+
+// ===== HELPERS =====
+function openWhatsApp(name, price) {
+  const phone = (siteSettings && siteSettings.whatsapp) || '+8801604674896';
+  const msg = encodeURIComponent(`আমি এই গিফটটি অর্ডার করতে চাই:\n\n📦 ${name}\n💰 ৳${price||'যোগাযোগ করুন'}\n\nঅনুগ্রহ করে আমাকে বিস্তারিত জানান।`);
+  window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
+}
+
+function copyLink(link) {
+  navigator.clipboard.writeText(link)
+    .then(() => showToast('✅ লিঙ্ক কপি হয়েছে!'))
+    .catch(() => {
+      const tmp = document.createElement('input');
+      tmp.value = link;
+      document.body.appendChild(tmp);
+      tmp.select();
+      document.execCommand('copy');
+      document.body.removeChild(tmp);
+      showToast('✅ লিঙ্ক কপি হয়েছে!');
+    });
+}
+
+function showToast(msg) {
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+// ===== INIT =====
+loadGiftImages('all');
+</script>
+</body>
+</html>
